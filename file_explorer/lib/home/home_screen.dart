@@ -10,6 +10,7 @@ import 'create_or_rename_folder_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   final void Function(ThemeMode) onThemeChanged;
+
   const HomeScreen({super.key, required this.onThemeChanged});
 
   @override
@@ -26,6 +27,55 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadFileAndFolder(_currentLocation);
+  }
+
+  Widget _buildPathSegments() {
+    if (_currentLocation.isEmpty) {
+      return Text("/");
+    }
+
+    List<String> segments = _currentLocation
+        .split("/")
+        .where((s) => s.isNotEmpty)
+        .toList();
+    List<Widget> widgets = [];
+
+    widgets.add(
+      GestureDetector(
+        onTap: () {
+          setState(() => _currentLocation = "");
+          _loadFileAndFolder("");
+        },
+        child: Text(
+          "/",
+          style: TextStyle(color: Theme.of(context).colorScheme.primary),
+        ),
+      ),
+    );
+
+    for (int i = 0; i < segments.length; i++) {
+      String path = segments.sublist(0, i + 1).join("/");
+      bool isLast = i == segments.length - 1;
+
+      widgets.add(
+        GestureDetector(
+          onTap: isLast
+              ? null
+              : () {
+                  setState(() => _currentLocation = path);
+                  _loadFileAndFolder(path);
+                },
+          child: Text(
+            "${segments[i]}${isLast ? "" : "/"}",
+            style: TextStyle(
+              color: isLast ? null : Theme.of(context).colorScheme.primary,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Row(children: widgets);
   }
 
   @override
@@ -58,14 +108,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   value: ThemeMode.light,
                   child: Text("Light Theme"),
                 ),
-                PopupMenuItem(
-                  value: ThemeMode.dark,
-                  child: Text("Dark Theme"),
-                ),
-                PopupMenuItem(
-                  value: ThemeMode.system,
-                  child: Text("System"),
-                ),
+                PopupMenuItem(value: ThemeMode.dark, child: Text("Dark Theme")),
+                PopupMenuItem(value: ThemeMode.system, child: Text("System")),
               ];
             },
           ),
@@ -79,14 +123,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: _currentLocation == ""
                     ? null
                     : () {
-                  List<String> directory = _currentLocation.split("/");
-                  directory.removeLast();
-                  _currentLocation = directory.join("/");
-                  _loadFileAndFolder(_currentLocation);
-                },
+                        List<String> directory = _currentLocation.split("/");
+                        directory.removeLast();
+                        _currentLocation = directory.join("/");
+                        _loadFileAndFolder(_currentLocation);
+                      },
                 icon: Icon(Icons.arrow_back_ios),
               ),
-              title: Text(_currentLocation.isEmpty ? "/" : _currentLocation),
+              title: _buildPathSegments(),
             ),
           ),
           SliverList.builder(
