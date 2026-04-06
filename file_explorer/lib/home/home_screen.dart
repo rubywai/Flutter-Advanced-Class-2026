@@ -169,6 +169,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           context: context,
                         );
                       }
+                    } else if (str == 'rename') {
+                      _renameFile(fileName);
                     }
                   },
                   itemBuilder: (context) {
@@ -224,6 +226,65 @@ class _HomeScreenState extends State<HomeScreen> {
     );
     if (isOK) {
       _loadFileAndFolder(_currentLocation);
+    }
+  }
+
+  void _renameFile(String oldName) async {
+    final TextEditingController controller = TextEditingController(
+      text: oldName,
+    );
+    bool? isOK = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Rename File"),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            decoration: InputDecoration(
+              labelText: "New file name",
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text("Rename"),
+            ),
+          ],
+        );
+      },
+    );
+    if (isOK == true && context.mounted) {
+      final newName = controller.text.trim();
+      if (newName.isNotEmpty && newName != oldName) {
+        try {
+          final oldFile = File('$_currentLocation/$oldName');
+          await oldFile.rename('$_currentLocation/$newName');
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: Colors.green,
+                content: Text("Rename success to $newName"),
+              ),
+            );
+          }
+          _loadFileAndFolder(_currentLocation);
+        } catch (e) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: Colors.red,
+                content: Text("Rename failed"),
+              ),
+            );
+          }
+        }
+      }
     }
   }
 
