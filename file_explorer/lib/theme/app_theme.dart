@@ -9,8 +9,16 @@ class AppTheme {
       ),
       listTileTheme: ListTileThemeData(
         iconColor: Colors.indigoAccent,
-        titleTextStyle: TextStyle(color: Colors.indigo),
-        subtitleTextStyle: TextStyle(color: Colors.indigoAccent),
+        titleTextStyle: TextStyle(
+          color: Colors.indigo,
+          inherit: false,
+          fontSize: 16,
+        ),
+        subtitleTextStyle: TextStyle(
+          color: Colors.indigoAccent,
+          inherit: false,
+          fontSize: 13,
+        ),
       ),
       iconButtonTheme: IconButtonThemeData(
         style: IconButton.styleFrom(foregroundColor: Colors.white),

@@ -9,7 +9,8 @@ import 'create_new_file_dialog.dart';
 import 'create_or_rename_folder_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final void Function(ThemeMode) onThemeChanged;
+  const HomeScreen({super.key, required this.onThemeChanged});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -48,11 +49,23 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.note_add_outlined),
           ),
           PopupMenuButton<ThemeMode>(
+            onSelected: (ThemeMode mode) {
+              widget.onThemeChanged(mode);
+            },
             itemBuilder: (context) {
               return [
-                PopupMenuItem(child: Text("Light Theme")),
-                PopupMenuItem(child: Text("Dark Theme")),
-                PopupMenuItem(child: Text("System")),
+                PopupMenuItem(
+                  value: ThemeMode.light,
+                  child: Text("Light Theme"),
+                ),
+                PopupMenuItem(
+                  value: ThemeMode.dark,
+                  child: Text("Dark Theme"),
+                ),
+                PopupMenuItem(
+                  value: ThemeMode.system,
+                  child: Text("System"),
+                ),
               ];
             },
           ),
@@ -66,11 +79,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: _currentLocation == ""
                     ? null
                     : () {
-                        List<String> directory = _currentLocation.split("/");
-                        directory.removeLast();
-                        _currentLocation = directory.join("/");
-                        _loadFileAndFolder(_currentLocation);
-                      },
+                  List<String> directory = _currentLocation.split("/");
+                  directory.removeLast();
+                  _currentLocation = directory.join("/");
+                  _loadFileAndFolder(_currentLocation);
+                },
                 icon: Icon(Icons.arrow_back_ios),
               ),
               title: Text(_currentLocation.isEmpty ? "/" : _currentLocation),
