@@ -1,4 +1,9 @@
 class ApiConst {
-  static const baseUrl = "https://10.0.2.2:11434";
+  ApiConst._();
+  static const baseUrl = "http://10.0.2.2:11434/api/chat";
   static const modelName = "gemma4:e2b";
+  static const systemMessage = {
+    "role": "system",
+    "content": "You are a concise assistant."
+  };
 }
