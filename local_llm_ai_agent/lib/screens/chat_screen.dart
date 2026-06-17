@@ -1,4 +1,7 @@
+import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:flutter/material.dart';
+import 'package:local_llm_ai_agent/const/chat_message_mapper.dart';
+import 'package:local_llm_ai_agent/data/models/response_model.dart';
 
 import '../const/api_const.dart';
 import '../data/chat_services/llm_chat_service.dart';
@@ -15,7 +18,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final LlmChatService _chatService = LlmChatService();
   final TextEditingController _chatController = TextEditingController();
   bool _loading = false;
-  String _answer = "";
+  final List<Message> _message = [];
 
   @override
   Widget build(BuildContext context) {
@@ -25,13 +28,27 @@ class _ChatScreenState extends State<ChatScreen> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            Expanded(child: Column(
-              children: [
-                if(_loading) CircularProgressIndicator(),
-                if(!_loading) Text(_answer),
-
-              ],
-            )),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _message.length + (_loading ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index >= _message.length) {
+                    return Align(
+                      alignment: Alignment.centerLeft,
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  Message message = _message[index];
+                  bool isSender = message.role == "user";
+                  return BubbleSpecialThree(
+                    color: isSender ? Colors.blueAccent : Colors.black87,
+                    text: message.content ?? "",
+                    isSender: isSender,
+                    textStyle: TextStyle(color: Colors.white),
+                  );
+                },
+              ),
+            ),
             SafeArea(
               child: TextField(
                 controller: _chatController,
@@ -59,15 +76,19 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void send(String prompt) {
-     setState(() {
-       _loading = true;
-       _answer = "";
-     });
+    setState(() {
+      _loading = true;
+      _message.add(Message(role: "user", content: prompt));
+    });
+    _chatController.clear();
     _chatService
         .sendChat(
           chatRequestModel: ChatRequestModel(
             model: ApiConst.modelName,
             messages: [
+              ..._message.map((v){
+                return toMessage(v);
+              }),
               Messages(
                 role: ApiConst.systemMessage["role"],
                 content: ApiConst.systemMessage["content"],
@@ -81,7 +102,10 @@ class _ChatScreenState extends State<ChatScreen> {
         .then((v) {
           setState(() {
             _loading = false;
-            _answer = v.message?.content ?? "";
+            Message? response = v.message;
+            if (response != null) {
+              _message.add(response);
+            }
           });
         });
   }
