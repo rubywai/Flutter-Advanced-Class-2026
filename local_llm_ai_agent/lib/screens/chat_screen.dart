@@ -80,13 +80,16 @@ class _ChatScreenState extends State<ChatScreen> {
       _loading = true;
       _message.add(Message(role: "user", content: prompt));
     });
+
     _chatController.clear();
+    Message answer = Message(role: "assistance", content: prompt);
+    bool isReceived = false;
     _chatService
-        .sendChat(
+        .sendChatStream(
           chatRequestModel: ChatRequestModel(
             model: ApiConst.modelName,
             messages: [
-              ..._message.map((v){
+              ..._message.map((v) {
                 return toMessage(v);
               }),
               Messages(
@@ -95,17 +98,19 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
               Messages(role: "user", content: prompt),
             ],
-            stream: false,
+            stream: true,
             think: false,
           ),
         )
-        .then((v) {
+        .listen((chunk) {
           setState(() {
             _loading = false;
-            Message? response = v.message;
-            if (response != null) {
-              _message.add(response);
+            if (!isReceived) {
+              _message.add(answer);
+              isReceived = true;
             }
+            answer.content =
+                (answer.content ?? "") + (chunk.message?.content ?? "");
           });
         });
   }
