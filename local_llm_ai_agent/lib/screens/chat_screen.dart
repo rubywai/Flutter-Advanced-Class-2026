@@ -19,6 +19,14 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _chatController = TextEditingController();
   bool _loading = false;
   final List<Message> _message = [];
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    super.dispose();
+    _chatController.dispose();
+    _scrollController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,21 +38,24 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             Expanded(
               child: ListView.builder(
+                controller: _scrollController,
                 itemCount: _message.length + (_loading ? 1 : 0),
                 itemBuilder: (context, index) {
                   if (index >= _message.length) {
                     return Align(
                       alignment: Alignment.centerLeft,
-                      child: CircularProgressIndicator(),
+                      child: Text("Thinking..."),
                     );
                   }
                   Message message = _message[index];
                   bool isSender = message.role == "user";
                   return BubbleSpecialThree(
-                    color: isSender ? Colors.blueAccent : Colors.black87,
+                    color: isSender ? Colors.blueAccent : Color(0xFFE8E8EE),
                     text: message.content ?? "",
                     isSender: isSender,
-                    textStyle: TextStyle(color: Colors.white),
+                    textStyle: isSender
+                        ? TextStyle(color: Colors.white)
+                        : TextStyle(),
                   );
                 },
               ),
@@ -112,6 +123,16 @@ class _ChatScreenState extends State<ChatScreen> {
             answer.content =
                 (answer.content ?? "") + (chunk.message?.content ?? "");
           });
+          _scrollToBottom();
         });
+  }
+
+  void _scrollToBottom() {
+    if(!_scrollController.hasClients) return;
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: Duration(milliseconds: 50),
+      curve: Curves.easeInOut,
+    );
   }
 }
