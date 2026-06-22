@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
+
 class ApiConst {
   ApiConst._();
-  static const baseUrl = "http://10.0.2.2:11434/api/chat";
+  static const baseUrl =  kIsWeb ?  "http://localhost:11434/api/chat" :    "http://10.0.2.2:11434/api/chat";
   static const modelName = "gemma4:e2b";
   static const systemMessage = {
     "role": "system",

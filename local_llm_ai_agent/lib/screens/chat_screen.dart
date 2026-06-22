@@ -32,55 +32,58 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Olla LLM Chat Agent")),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                controller: _scrollController,
-                itemCount: _message.length + (_loading ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (index >= _message.length) {
-                    return Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text("Thinking..."),
+      body: Center(
+        child: Container(
+          constraints: BoxConstraints(maxWidth: 600),
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  controller: _scrollController,
+                  itemCount: _message.length + (_loading ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index >= _message.length) {
+                      return Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text("Thinking..."),
+                      );
+                    }
+                    Message message = _message[index];
+                    bool isSender = message.role == "user";
+                    return BubbleSpecialThree(
+                      color: isSender ? Colors.blueAccent : Color(0xFFE8E8EE),
+                      text: message.content ?? "",
+                      isSender: isSender,
+                      textStyle: isSender
+                          ? TextStyle(color: Colors.white)
+                          : TextStyle(),
                     );
-                  }
-                  Message message = _message[index];
-                  bool isSender = message.role == "user";
-                  return BubbleSpecialThree(
-                    color: isSender ? Colors.blueAccent : Color(0xFFE8E8EE),
-                    text: message.content ?? "",
-                    isSender: isSender,
-                    textStyle: isSender
-                        ? TextStyle(color: Colors.white)
-                        : TextStyle(),
-                  );
-                },
-              ),
-            ),
-            SafeArea(
-              child: TextField(
-                controller: _chatController,
-                onChanged: (_) {
-                  setState(() {});
-                },
-                decoration: InputDecoration(
-                  suffixIcon: IconButton(
-                    onPressed: _chatController.text.trim().isEmpty
-                        ? null
-                        : () {
-                            send(_chatController.text);
-                          },
-                    icon: Icon(Icons.send),
-                  ),
-                  labelText: "Enter your prompt",
-                  border: OutlineInputBorder(),
+                  },
                 ),
               ),
-            ),
-          ],
+              SafeArea(
+                child: TextField(
+                  controller: _chatController,
+                  onChanged: (_) {
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    suffixIcon: IconButton(
+                      onPressed: _chatController.text.trim().isEmpty
+                          ? null
+                          : () {
+                              send(_chatController.text);
+                            },
+                      icon: Icon(Icons.send),
+                    ),
+                    labelText: "Enter your prompt",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
