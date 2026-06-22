@@ -51,6 +51,9 @@ class _ChatScreenState extends State<ChatScreen> {
                     }
                     Message message = _message[index];
                     bool isSender = message.role == "user";
+                    if(message.content?.isEmpty == true){
+                      return SizedBox.shrink();
+                    }
                     return BubbleSpecialThree(
                       color: isSender ? Colors.blueAccent : Color(0xFFE8E8EE),
                       text: message.content ?? "",
@@ -70,11 +73,13 @@ class _ChatScreenState extends State<ChatScreen> {
                   },
                   decoration: InputDecoration(
                     suffixIcon: IconButton(
-                      onPressed: _chatController.text.trim().isEmpty
+                      onPressed: _chatController.text
+                          .trim()
+                          .isEmpty
                           ? null
                           : () {
-                              send(_chatController.text);
-                            },
+                        send(_chatController.text);
+                      },
                       icon: Icon(Icons.send),
                     ),
                     labelText: "Enter your prompt",
@@ -96,46 +101,73 @@ class _ChatScreenState extends State<ChatScreen> {
     });
 
     _chatController.clear();
-    Message answer = Message(role: "assistance", content: prompt);
+    Message answer = Message(role: "assistance", content: "");
     bool isReceived = false;
     _chatService
         .sendChatStream(
-          chatRequestModel: ChatRequestModel(
-            model: ApiConst.modelName,
-            messages: [
-              ..._message.map((v) {
-                return toMessage(v);
-              }),
-              Messages(
-                role: ApiConst.systemMessage["role"],
-                content: ApiConst.systemMessage["content"],
-              ),
-              Messages(role: "user", content: prompt),
-            ],
-            stream: true,
-            think: false,
+      chatRequestModel: ChatRequestModel(
+        model: ApiConst.modelName,
+        messages: [
+          ..._message.map((v) {
+            return toMessage(v);
+          }),
+          Messages(
+            role: ApiConst.systemMessage["role"],
+            content: ApiConst.systemMessage["content"],
           ),
-        )
+          Messages(role: "user", content: prompt),
+        ],
+        stream: true,
+        think: false,
+      ),
+    )
         .listen((chunk) {
-          setState(() {
-            _loading = false;
-            if (!isReceived) {
-              _message.add(answer);
-              isReceived = true;
+      setState(() {
+        _loading = false;
+        if (!isReceived) {
+          _message.add(answer);
+          isReceived = true;
+        }
+        answer.content =
+            (answer.content ?? "") + (chunk.message?.content ?? "");
+        List<ToolCalls> tools = chunk.message?.toolCalls ?? [];
+        for (var tool in tools) {
+          String? id = tool.id;
+          String? name = tool.function?.name;
+          if (name == "show_warning_dialog") {
+            Arguments? arguments = tool.function?.arguments;
+            String? title = arguments?.title;
+            String? content = arguments?.content;
+            if (title != null && content != null) {
+              showWarningDialog(title, content);
             }
-            answer.content =
-                (answer.content ?? "") + (chunk.message?.content ?? "");
-          });
-          _scrollToBottom();
-        });
+          }
+        }
+      });
+      _scrollToBottom();
+    });
   }
 
   void _scrollToBottom() {
-    if(!_scrollController.hasClients) return;
+    if (!_scrollController.hasClients) return;
     _scrollController.animateTo(
       _scrollController.position.maxScrollExtent,
       duration: Duration(milliseconds: 50),
       curve: Curves.easeInOut,
     );
+  }
+
+  void showWarningDialog(String title, String content) {
+    showDialog(context: context, builder: (context) {
+      return AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: [
+          FilledButton(onPressed: () {
+            Navigator.pop(context);
+          }, child: Text("OK"),),
+        ],
+      );
+    });
   }
 }

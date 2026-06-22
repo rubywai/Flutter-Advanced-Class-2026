@@ -29,7 +29,7 @@ class LlmChatService {
         headers: {"Content-Type": "application/json"},
         responseType: ResponseType.stream,
       ),
-      data: chatRequestModel.toJson(),
+      data: chatRequestModel.copyWith(tools: ApiConst.systemTools).toJson(),
     );
 
     final lines = response.data!.stream

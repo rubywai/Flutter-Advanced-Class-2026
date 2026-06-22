@@ -87,23 +87,121 @@ class ResponseModel {
 }
 
 class Message {
-  Message({this.role, this.content});
+  Message({this.role, this.content, this.toolCalls});
 
   Message.fromJson(dynamic json) {
     role = json['role'];
     content = json['content'];
+    if (json['tool_calls'] != null) {
+      toolCalls = [];
+      json['tool_calls'].forEach((v) {
+        toolCalls?.add(ToolCalls.fromJson(v));
+      });
+    }
   }
 
   String? role;
   String? content;
+  List<ToolCalls>? toolCalls;
 
-  Message copyWith({String? role, String? content}) =>
-      Message(role: role ?? this.role, content: content ?? this.content);
+  Message copyWith({
+    String? role,
+    String? content,
+    List<ToolCalls>? toolCalls,
+  }) => Message(
+    role: role ?? this.role,
+    content: content ?? this.content,
+    toolCalls: toolCalls ?? this.toolCalls,
+  );
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['role'] = role;
     map['content'] = content;
+    if (toolCalls != null) {
+      map['tool_calls'] = toolCalls?.map((v) => v.toJson()).toList();
+    }
+    return map;
+  }
+}
+
+class ToolCalls {
+  ToolCalls({this.id, this.function});
+
+  ToolCalls.fromJson(dynamic json) {
+    id = json['id'];
+    function = json['function'] != null
+        ? FunctionTool.fromJson(json['function'])
+        : null;
+  }
+
+  String? id;
+  FunctionTool? function;
+
+  ToolCalls copyWith({String? id, FunctionTool? function}) =>
+      ToolCalls(id: id ?? this.id, function: function ?? this.function);
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    if (function != null) {
+      map['function'] = function?.toJson();
+    }
+    return map;
+  }
+}
+
+class FunctionTool {
+  FunctionTool({this.index, this.name, this.arguments});
+
+  FunctionTool.fromJson(dynamic json) {
+    index = json['index'];
+    name = json['name'];
+    arguments = json['arguments'] != null
+        ? Arguments.fromJson(json['arguments'])
+        : null;
+  }
+
+  num? index;
+  String? name;
+  Arguments? arguments;
+
+  FunctionTool copyWith({num? index, String? name, Arguments? arguments}) =>
+      FunctionTool(
+        index: index ?? this.index,
+        name: name ?? this.name,
+        arguments: arguments ?? this.arguments,
+      );
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['index'] = index;
+    map['name'] = name;
+    if (arguments != null) {
+      map['arguments'] = arguments?.toJson();
+    }
+    return map;
+  }
+}
+
+class Arguments {
+  Arguments({this.content, this.title});
+
+  Arguments.fromJson(dynamic json) {
+    content = json['content'];
+    title = json['title'];
+  }
+
+  String? content;
+  String? title;
+
+  Arguments copyWith({String? content, String? title}) =>
+      Arguments(content: content ?? this.content, title: title ?? this.title);
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['content'] = content;
+    map['title'] = title;
     return map;
   }
 }
