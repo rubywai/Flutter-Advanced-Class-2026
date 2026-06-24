@@ -1,12 +1,15 @@
 import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:flutter/material.dart';
 import 'package:local_llm_ai_agent/const/chat_message_mapper.dart';
+import 'package:local_llm_ai_agent/data/crypto_service/crypto_service.dart';
+import 'package:local_llm_ai_agent/data/models/crypto_response_model.dart';
 import 'package:local_llm_ai_agent/data/models/response_model.dart';
 
 import '../const/api_const.dart';
 import '../data/chat_services/llm_chat_service.dart';
 import '../data/models/chat_request_model.dart';
 
+// crypto tool -> dart funciton -> result -> llm
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
 
@@ -51,7 +54,8 @@ class _ChatScreenState extends State<ChatScreen> {
                     }
                     Message message = _message[index];
                     bool isSender = message.role == "user";
-                    if(message.content?.isEmpty == true){
+                    if (message.content?.isEmpty == true ||
+                        message.role == "tool") {
                       return SizedBox.shrink();
                     }
                     return BubbleSpecialThree(
@@ -73,13 +77,11 @@ class _ChatScreenState extends State<ChatScreen> {
                   },
                   decoration: InputDecoration(
                     suffixIcon: IconButton(
-                      onPressed: _chatController.text
-                          .trim()
-                          .isEmpty
+                      onPressed: _chatController.text.trim().isEmpty
                           ? null
                           : () {
-                        send(_chatController.text);
-                      },
+                              send(_chatController.text);
+                            },
                       icon: Icon(Icons.send),
                     ),
                     labelText: "Enter your prompt",
@@ -94,57 +96,74 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  void send(String prompt) {
+  void send(String prompt, {bool isTool = false}) {
     setState(() {
       _loading = true;
-      _message.add(Message(role: "user", content: prompt));
+      if (isTool) {
+        _message.add(Message(role: "tool", content: prompt));
+      } else {
+        _message.add(Message(role: "user", content: prompt));
+      }
     });
 
     _chatController.clear();
     Message answer = Message(role: "assistance", content: "");
     bool isReceived = false;
+    List<ToolCalls> tools = [];
     _chatService
         .sendChatStream(
-      chatRequestModel: ChatRequestModel(
-        model: ApiConst.modelName,
-        messages: [
-          ..._message.map((v) {
-            return toMessage(v);
-          }),
-          Messages(
-            role: ApiConst.systemMessage["role"],
-            content: ApiConst.systemMessage["content"],
+          chatRequestModel: ChatRequestModel(
+            model: ApiConst.modelName,
+            messages: [
+              ..._message.map((v) {
+                return toMessage(v);
+              }),
+              Messages(
+                role: ApiConst.systemMessage["role"],
+                content: ApiConst.systemMessage["content"],
+              ),
+              Messages(role: "user", content: prompt),
+            ],
+            stream: true,
+            think: false,
           ),
-          Messages(role: "user", content: prompt),
-        ],
-        stream: true,
-        think: false,
-      ),
-    )
+        )
         .listen((chunk) {
-      setState(() {
-        _loading = false;
-        if (!isReceived) {
-          _message.add(answer);
-          isReceived = true;
-        }
-        answer.content =
-            (answer.content ?? "") + (chunk.message?.content ?? "");
-        List<ToolCalls> tools = chunk.message?.toolCalls ?? [];
-        for (var tool in tools) {
-          String? id = tool.id;
-          String? name = tool.function?.name;
-          if (name == "show_warning_dialog") {
-            Arguments? arguments = tool.function?.arguments;
-            String? title = arguments?.title;
-            String? content = arguments?.content;
-            if (title != null && content != null) {
-              showWarningDialog(title, content);
+          setState(() {
+            _loading = false;
+            if (!isReceived) {
+              _message.add(answer);
+              isReceived = true;
             }
+            answer.content =
+                (answer.content ?? "") + (chunk.message?.content ?? "");
+             tools.addAll(chunk.message?.toolCalls ?? []);
+          });
+          _scrollToBottom();
+        }).onDone((){
+      for (var tool in tools) {
+        String? id = tool.id;
+        String? name = tool.function?.name;
+        if (name == "show_warning_dialog") {
+          Map? arguments = tool.function?.arguments;
+          String? title = arguments?["title"];
+          String? content = arguments?["content"];
+          if (title != null && content != null) {
+            showWarningDialog(title, content);
+          }
+        } else if (name == "get_binance_price") {
+          Map? arguments = tool.function?.arguments;
+          String? symbol = arguments?["symbol"];
+          if (symbol != null) {
+            getCrypto(symbol).then((v) {
+              send(
+                "This is the result from get_binance_price tool but please answer in human readable format like comma and price unit : ${v.toJson()}",
+                isTool: true,
+              );
+            });
           }
         }
-      });
-      _scrollToBottom();
+      }
     });
   }
 
@@ -158,16 +177,31 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void showWarningDialog(String title, String content) {
-    showDialog(context: context, builder: (context) {
-      return AlertDialog(
-        title: Text(title),
-        content: Text(content),
-        actions: [
-          FilledButton(onPressed: () {
-            Navigator.pop(context);
-          }, child: Text("OK"),),
-        ],
-      );
-    });
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: [
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<CryptoResponseModel> getCrypto(String symbol) {
+    try {
+      CryptoService cryptoService = CryptoService();
+      return cryptoService.getCryptoPrice(symbol);
+    } catch (e) {
+      throw Exception("Failed to get crypto price: $e");
+    }
   }
 }

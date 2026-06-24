@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:local_llm_ai_agent/const/tools.dart';
 import 'package:local_llm_ai_agent/data/models/response_model.dart';
 
 import '../../const/api_const.dart';
@@ -29,7 +30,7 @@ class LlmChatService {
         headers: {"Content-Type": "application/json"},
         responseType: ResponseType.stream,
       ),
-      data: chatRequestModel.copyWith(tools: ApiConst.systemTools).toJson(),
+      data: chatRequestModel.copyWith(tools: AppTools.systemTools).toJson(),
     );
 
     final lines = response.data!.stream

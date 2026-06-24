@@ -132,21 +132,19 @@ class Parameters {
 
   Parameters.fromJson(dynamic json) {
     type = json['type'];
-    properties = json['properties'] != null
-        ? Properties.fromJson(json['properties'])
-        : null;
+    properties = json['properties'];
     required = json['required'] != null ? json['required'].cast<String>() : [];
     additionalProperties = json['additionalProperties'];
   }
 
   String? type;
-  Properties? properties;
+  Map? properties;
   List<String>? required;
   bool? additionalProperties;
 
   Parameters copyWith({
     String? type,
-    Properties? properties,
+    Map? properties,
     List<String>? required,
     bool? additionalProperties,
   }) => Parameters(
@@ -160,7 +158,7 @@ class Parameters {
     final map = <String, dynamic>{};
     map['type'] = type;
     if (properties != null) {
-      map['properties'] = properties?.toJson();
+      map['properties'] = properties;
     }
     map['required'] = required;
     map['additionalProperties'] = additionalProperties;
@@ -168,81 +166,6 @@ class Parameters {
   }
 }
 
-class Properties {
-  Properties({this.title, this.content});
-
-  Properties.fromJson(dynamic json) {
-    title = json['title'] != null ? Title.fromJson(json['title']) : null;
-    content = json['content'] != null
-        ? Content.fromJson(json['content'])
-        : null;
-  }
-
-  Title? title;
-  Content? content;
-
-  Properties copyWith({Title? title, Content? content}) =>
-      Properties(title: title ?? this.title, content: content ?? this.content);
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    if (title != null) {
-      map['title'] = title?.toJson();
-    }
-    if (content != null) {
-      map['content'] = content?.toJson();
-    }
-    return map;
-  }
-}
-
-class Content {
-  Content({this.type, this.description});
-
-  Content.fromJson(dynamic json) {
-    type = json['type'];
-    description = json['description'];
-  }
-
-  String? type;
-  String? description;
-
-  Content copyWith({String? type, String? description}) => Content(
-    type: type ?? this.type,
-    description: description ?? this.description,
-  );
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['type'] = type;
-    map['description'] = description;
-    return map;
-  }
-}
-
-class Title {
-  Title({this.type, this.description});
-
-  Title.fromJson(dynamic json) {
-    type = json['type'];
-    description = json['description'];
-  }
-
-  String? type;
-  String? description;
-
-  Title copyWith({String? type, String? description}) => Title(
-    type: type ?? this.type,
-    description: description ?? this.description,
-  );
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['type'] = type;
-    map['description'] = description;
-    return map;
-  }
-}
 
 class Messages {
   Messages({this.role, this.content});

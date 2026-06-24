@@ -157,16 +157,14 @@ class FunctionTool {
   FunctionTool.fromJson(dynamic json) {
     index = json['index'];
     name = json['name'];
-    arguments = json['arguments'] != null
-        ? Arguments.fromJson(json['arguments'])
-        : null;
+    arguments = json['arguments'];
   }
 
   num? index;
   String? name;
-  Arguments? arguments;
+  Map? arguments;
 
-  FunctionTool copyWith({num? index, String? name, Arguments? arguments}) =>
+  FunctionTool copyWith({num? index, String? name, Map? arguments}) =>
       FunctionTool(
         index: index ?? this.index,
         name: name ?? this.name,
@@ -178,30 +176,8 @@ class FunctionTool {
     map['index'] = index;
     map['name'] = name;
     if (arguments != null) {
-      map['arguments'] = arguments?.toJson();
+      map['arguments'] = arguments;
     }
-    return map;
-  }
-}
-
-class Arguments {
-  Arguments({this.content, this.title});
-
-  Arguments.fromJson(dynamic json) {
-    content = json['content'];
-    title = json['title'];
-  }
-
-  String? content;
-  String? title;
-
-  Arguments copyWith({String? content, String? title}) =>
-      Arguments(content: content ?? this.content, title: title ?? this.title);
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['content'] = content;
-    map['title'] = title;
     return map;
   }
 }
