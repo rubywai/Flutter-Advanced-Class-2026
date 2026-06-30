@@ -107,7 +107,7 @@ class _ChatScreenState extends State<ChatScreen> {
     });
 
     _chatController.clear();
-    Message answer = Message(role: "assistance", content: "");
+    Message answer = Message(role: "assistant", content: "");
     bool isReceived = false;
     List<ToolCalls> tools = [];
     _chatService
@@ -115,7 +115,7 @@ class _ChatScreenState extends State<ChatScreen> {
           chatRequestModel: ChatRequestModel(
             model: ApiConst.modelName,
             messages: [
-              ..._message.map((v) {
+              ..._message.sublist(_message.length > 20 ? _message.length - 20 : 0).map((v) {
                 return toMessage(v);
               }),
               Messages(
