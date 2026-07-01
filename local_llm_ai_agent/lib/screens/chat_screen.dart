@@ -1,12 +1,15 @@
 import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:flutter/material.dart';
 import 'package:local_llm_ai_agent/const/chat_message_mapper.dart';
+import 'package:local_llm_ai_agent/data/crypto_service/crypto_service.dart';
+import 'package:local_llm_ai_agent/data/models/crypto_response_model.dart';
 import 'package:local_llm_ai_agent/data/models/response_model.dart';
 
 import '../const/api_const.dart';
 import '../data/chat_services/llm_chat_service.dart';
 import '../data/models/chat_request_model.dart';
 
+// crypto tool -> dart funciton -> result -> llm
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
 
@@ -19,74 +22,100 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _chatController = TextEditingController();
   bool _loading = false;
   final List<Message> _message = [];
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    super.dispose();
+    _chatController.dispose();
+    _scrollController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Olla LLM Chat Agent")),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: _message.length + (_loading ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (index >= _message.length) {
-                    return Align(
-                      alignment: Alignment.centerLeft,
-                      child: CircularProgressIndicator(),
+      body: Center(
+        child: Container(
+          constraints: BoxConstraints(maxWidth: 600),
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  controller: _scrollController,
+                  itemCount: _message.length + (_loading ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index >= _message.length) {
+                      return Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text("Thinking..."),
+                      );
+                    }
+                    Message message = _message[index];
+                    bool isSender = message.role == "user";
+                    if (message.content?.isEmpty == true ||
+                        message.role == "tool") {
+                      return SizedBox.shrink();
+                    }
+                    return BubbleSpecialThree(
+                      color: isSender ? Colors.blueAccent : Color(0xFFE8E8EE),
+                      text: message.content ?? "",
+                      isSender: isSender,
+                      textStyle: isSender
+                          ? TextStyle(color: Colors.white)
+                          : TextStyle(),
                     );
-                  }
-                  Message message = _message[index];
-                  bool isSender = message.role == "user";
-                  return BubbleSpecialThree(
-                    color: isSender ? Colors.blueAccent : Colors.black87,
-                    text: message.content ?? "",
-                    isSender: isSender,
-                    textStyle: TextStyle(color: Colors.white),
-                  );
-                },
-              ),
-            ),
-            SafeArea(
-              child: TextField(
-                controller: _chatController,
-                onChanged: (_) {
-                  setState(() {});
-                },
-                decoration: InputDecoration(
-                  suffixIcon: IconButton(
-                    onPressed: _chatController.text.trim().isEmpty
-                        ? null
-                        : () {
-                            send(_chatController.text);
-                          },
-                    icon: Icon(Icons.send),
-                  ),
-                  labelText: "Enter your prompt",
-                  border: OutlineInputBorder(),
+                  },
                 ),
               ),
-            ),
-          ],
+              SafeArea(
+                child: TextField(
+                  controller: _chatController,
+                  onChanged: (_) {
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    suffixIcon: IconButton(
+                      onPressed: _chatController.text.trim().isEmpty
+                          ? null
+                          : () {
+                              send(_chatController.text);
+                            },
+                      icon: Icon(Icons.send),
+                    ),
+                    labelText: "Enter your prompt",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  void send(String prompt) {
+  void send(String prompt, {bool isTool = false}) {
     setState(() {
       _loading = true;
-      _message.add(Message(role: "user", content: prompt));
+      if (isTool) {
+        _message.add(Message(role: "tool", content: prompt));
+      } else {
+        _message.add(Message(role: "user", content: prompt));
+      }
     });
+
     _chatController.clear();
+    Message answer = Message(role: "assistant", content: "");
+    bool isReceived = false;
+    List<ToolCalls> tools = [];
     _chatService
-        .sendChat(
+        .sendChatStream(
           chatRequestModel: ChatRequestModel(
             model: ApiConst.modelName,
             messages: [
-              ..._message.map((v){
+              ..._message.sublist(_message.length > 20 ? _message.length - 20 : 0).map((v) {
                 return toMessage(v);
               }),
               Messages(
@@ -95,18 +124,84 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
               Messages(role: "user", content: prompt),
             ],
-            stream: false,
+            stream: true,
             think: false,
           ),
         )
-        .then((v) {
+        .listen((chunk) {
           setState(() {
             _loading = false;
-            Message? response = v.message;
-            if (response != null) {
-              _message.add(response);
+            if (!isReceived) {
+              _message.add(answer);
+              isReceived = true;
             }
+            answer.content =
+                (answer.content ?? "") + (chunk.message?.content ?? "");
+             tools.addAll(chunk.message?.toolCalls ?? []);
           });
-        });
+          _scrollToBottom();
+        }).onDone((){
+      for (var tool in tools) {
+        String? id = tool.id;
+        String? name = tool.function?.name;
+        if (name == "show_warning_dialog") {
+          Map? arguments = tool.function?.arguments;
+          String? title = arguments?["title"];
+          String? content = arguments?["content"];
+          if (title != null && content != null) {
+            showWarningDialog(title, content);
+          }
+        } else if (name == "get_binance_price") {
+          Map? arguments = tool.function?.arguments;
+          String? symbol = arguments?["symbol"];
+          if (symbol != null) {
+            getCrypto(symbol).then((v) {
+              send(
+                "This is the result from get_binance_price tool but please answer in human readable format like comma and price unit : ${v.toJson()}",
+                isTool: true,
+              );
+            });
+          }
+        }
+      }
+    });
+  }
+
+  void _scrollToBottom() {
+    if (!_scrollController.hasClients) return;
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: Duration(milliseconds: 50),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void showWarningDialog(String title, String content) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: [
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<CryptoResponseModel> getCrypto(String symbol) {
+    try {
+      CryptoService cryptoService = CryptoService();
+      return cryptoService.getCryptoPrice(symbol);
+    } catch (e) {
+      throw Exception("Failed to get crypto price: $e");
+    }
   }
 }
