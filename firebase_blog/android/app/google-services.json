@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "515332910105",
+    "project_id": "blogapp-bc757",
+    "storage_bucket": "blogapp-bc757.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:515332910105:android:9363ffc1d8b1ffd1bc4e88",
+        "android_client_info": {
+          "package_name": "com.rubylearner.fireabse.firebase_blog"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfyUNzetCX9Fj-x4EBNYTvdoB8DLJeKE0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
