@@ -2,18 +2,33 @@ import 'package:firebase_blog/data/blog_database.dart';
 import 'package:firebase_blog/data/blog_post_model.dart';
 import 'package:flutter/material.dart';
 
-class AddBlogPostDialog extends StatefulWidget {
-  const AddBlogPostDialog({super.key});
+class EditBlogPostDialog extends StatefulWidget {
+  const EditBlogPostDialog({
+    super.key,
+    required this.title,
+    required this.desc,
+    required this.docId,
+  });
+
+  final String title;
+  final String desc;
+  final String docId;
 
   @override
-  State<AddBlogPostDialog> createState() => _AddBlogPostDialogState();
+  State<EditBlogPostDialog> createState() => _EditBlogPostDialogState();
 }
 
-class _AddBlogPostDialogState extends State<AddBlogPostDialog> {
+class _EditBlogPostDialogState extends State<EditBlogPostDialog> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final BlogDatabase _blogDatabase = BlogDatabase();
   bool _isLoading = false;
+  @override
+  void initState() {
+    super.initState();
+    _titleController.text = widget.title;
+    _descriptionController.text = widget.desc;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,17 +79,18 @@ class _AddBlogPostDialogState extends State<AddBlogPostDialog> {
                       setState(() {
                         _isLoading = true;
                       });
-                      await _blogDatabase.createBlogPost(
+                      await _blogDatabase.updatePost(
                         blogPostModel: BlogPostModel(
                           title: _titleController.text,
                           description: _descriptionController.text,
                         ),
+                        docId: widget.docId,
                       );
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           backgroundColor: Colors.green,
                           content: Text(
-                            "Blog post created successfully",
+                            "Blog post updated successfully",
                             style: TextStyle(color: Colors.white),
                           ),
                         ),
@@ -85,7 +101,7 @@ class _AddBlogPostDialogState extends State<AddBlogPostDialog> {
                       SnackBar(
                         backgroundColor: Colors.red,
                         content: Text(
-                          "Create blog post failed $e",
+                          "Update blog post failed $e",
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
@@ -97,7 +113,7 @@ class _AddBlogPostDialogState extends State<AddBlogPostDialog> {
                     Navigator.pop(context);
                   }
                 },
-          child: Text("Add Post"),
+          child: Text("Update Post"),
         ),
       ],
     );
