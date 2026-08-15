@@ -5,6 +5,8 @@ import 'package:firebase_blog/widgets/add_blog_post_dialog.dart';
 import 'package:firebase_blog/widgets/edit_blog_post_dialog.dart';
 import 'package:flutter/material.dart';
 
+import '../widgets/blog_post_item.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -29,32 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
               itemBuilder: (context, index) {
                 final String documentId = list[index].id;
                 final BlogPostModel blogDoc = list[index].data();
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Card(
-                    elevation: 0,
-                    child: ListTile(
-                      leading: IconButton(
-                        onPressed: () {
-                          _editBlogPostDialog(
-                            title: blogDoc.title ?? "",
-                            desc: blogDoc.description ?? "",
-                            docId: documentId,
-                          );
-                        },
-                        icon: Icon(Icons.edit),
-                      ),
-                      title: Text(blogDoc.title ?? ""),
-                      subtitle: Text(blogDoc.description ?? ""),
-                      trailing: IconButton(
-                        onPressed: () {
-                          _blogDatabase.deletePost(documentId);
-                        },
-                        icon: Icon(Icons.delete),
-                      ),
-                    ),
-                  ),
-                );
+                return BlogPostItem(blogDoc: blogDoc, docId: documentId);
               },
             );
           } else if (snapshot.hasError) {
@@ -79,16 +56,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _editBlogPostDialog({
-    required String title,
-    required String desc,
-    required String docId,
-  }) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return EditBlogPostDialog(title: title, desc: desc, docId: docId);
-      },
-    );
-  }
 }

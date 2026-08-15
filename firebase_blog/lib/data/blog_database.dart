@@ -18,7 +18,9 @@ class BlogDatabase {
   }) async {
     try {
       DateTime now = DateTime.now();
-      return _blogCollection.add(blogPostModel);
+      return _blogCollection.add(
+        blogPostModel.copyWith(updatedAt: now.millisecondsSinceEpoch),
+      );
     } catch (e) {
       return Future.error(e);
     }
@@ -46,7 +48,13 @@ class BlogDatabase {
   }) async {
     try {
       DateTime now = DateTime.now();
-      _blogCollection.doc(docId).update(blogPostModel.toJson());
+      _blogCollection
+          .doc(docId)
+          .update(
+            blogPostModel
+                .copyWith(updatedAt: now.millisecondsSinceEpoch)
+                .toJson(),
+          );
     } catch (e) {
       return Future.error(e);
     }
