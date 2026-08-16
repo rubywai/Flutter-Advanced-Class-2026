@@ -28,7 +28,6 @@ lib/
     feature_name/
       data/
         models/
-        repositories/
         services/
       domain/
         entities/
@@ -48,8 +47,8 @@ Current core folders:
 
 Current feature folders:
 
-- `lib/features/home`
 - `lib/features/products`
+- `lib/features/categories`
 - `lib/features/cart`
 - `lib/features/profile`
 
@@ -60,6 +59,7 @@ Current feature folders:
 - Use Riverpod providers for dependency injection and state.
 - Keep Dio configuration centralized in `lib/core/network/dio_provider.dart`.
 - Do not create feature-specific Dio instances unless there is a strong reason.
+- Keep product API access in the service and provider layers; do not add a repository layer for this app.
 - Use `go_router` route names and route constants from `lib/core/router`.
 - Keep screens thin. Move business logic into providers, repositories, or use cases.
 - Keep API models separate from UI widgets.
@@ -74,10 +74,19 @@ Route paths are centralized in `lib/core/router/app_routes.dart`.
 Current routes:
 
 - `/`
-- `/products`
 - `/products/:productId`
+- `/categories`
 - `/cart`
 - `/profile`
+
+The app uses one bottom navigation shell with these tabs:
+
+- Home
+- Category
+- Cart
+- Profile
+
+The Home tab shows the product list.
 
 Temporary custom deep-link scheme:
 
@@ -106,13 +115,12 @@ flutter run --dart-define=API_BASE_URL=https://your-api.example.com
 
 ## Testing
 
-Add tests near the behavior being changed.
+The `test/` folder is intentionally removed for this app.
 
 Minimum expectations:
 
 - Run `flutter analyze` before handoff.
-- Run `flutter test` before handoff.
-- Update widget tests when app entry, routing, or visible UI changes.
+- Do not add tests unless the user asks for them.
 
 ## Development Guidelines
 

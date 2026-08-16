@@ -6,7 +6,7 @@ final dioProvider = Provider<Dio>((ref) {
     BaseOptions(
       baseUrl: const String.fromEnvironment(
         'API_BASE_URL',
-        defaultValue: 'https://api.example.com',
+        defaultValue: 'https://shopapi.rubylearner.com',
       ),
       connectTimeout: const Duration(seconds: 15),
       receiveTimeout: const Duration(seconds: 15),
