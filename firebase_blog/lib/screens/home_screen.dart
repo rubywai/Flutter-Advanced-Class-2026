@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_blog/data/blog_database.dart';
 import 'package:firebase_blog/data/blog_post_model.dart';
-import 'package:firebase_blog/data/google_login.dart';
+import 'package:firebase_blog/data/login_utils.dart';
 import 'package:firebase_blog/widgets/add_blog_post_dialog.dart';
 import 'package:firebase_blog/widgets/edit_blog_post_dialog.dart';
 import 'package:flutter/material.dart';
@@ -26,9 +27,9 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             onPressed: () {
-              signInWithGoogle();
+              FirebaseAuth.instance.signOut();
             },
-            icon: Icon(Icons.person),
+            icon: Icon(Icons.exit_to_app),
           ),
         ],
       ),
