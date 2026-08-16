@@ -1,7 +1,8 @@
 import 'package:firebase_blog/screens/home_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-
+//login, auth
+//google , apple login (social login)
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_blog/data/blog_database.dart';
 import 'package:firebase_blog/data/blog_post_model.dart';
+import 'package:firebase_blog/data/google_login.dart';
 import 'package:firebase_blog/widgets/add_blog_post_dialog.dart';
 import 'package:firebase_blog/widgets/edit_blog_post_dialog.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,17 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Blog App")),
+      appBar: AppBar(
+        title: Text("Blog App"),
+        actions: [
+          IconButton(
+            onPressed: () {
+              signInWithGoogle();
+            },
+            icon: Icon(Icons.person),
+          ),
+        ],
+      ),
       body: StreamBuilder<QuerySnapshot<BlogPostModel>>(
         stream: _blogDatabase.readBlogList(),
         builder: (context, snapshot) {
@@ -55,5 +66,4 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
-
 }

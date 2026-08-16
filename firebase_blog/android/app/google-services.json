@@ -12,7 +12,20 @@
           "package_name": "com.rubylearner.fireabse.firebase_blog"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "515332910105-8qe79k90lhvsv1trqu2j9tsr5d7aoc9t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rubylearner.fireabse.firebase_blog",
+            "certificate_hash": "f41bcb088b00c2db82950f7584c290b3c4f808f4"
+          }
+        },
+        {
+          "client_id": "515332910105-balfll3rrpopuvs06e4nle2k500nhjg3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAfyUNzetCX9Fj-x4EBNYTvdoB8DLJeKE0"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "515332910105-balfll3rrpopuvs06e4nle2k500nhjg3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "515332910105-7spddqja2mc032tvg4qcss7usi8oj3mk.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.rubylearner.fireabse.firebaseBlog"
+              }
+            }
+          ]
         }
       }
     }
