@@ -81,12 +81,19 @@ class _BlogPostItemState extends State<BlogPostItem> {
               Divider(),
               Center(
                 child: Text(
-                  widget.blogDoc.title ?? "",
+                  blogDoc.title ?? "",
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
               ),
               SizedBox(height: 4),
-              Text(widget.blogDoc.description ?? ""),
+              Text(blogDoc.description ?? ""),
+              if (blogDoc.image != null) SizedBox(height: 4),
+              if (blogDoc.image != null)
+                Image.memory(
+                  blogDoc.image!.bytes,
+                  height: 300,
+                  fit: BoxFit.cover,
+                ),
             ],
           ),
         ),

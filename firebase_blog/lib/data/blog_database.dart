@@ -19,7 +19,7 @@ class BlogDatabase {
     try {
       DateTime now = DateTime.now();
       return _blogCollection.add(
-        blogPostModel.copyWith(updatedAt: now.millisecondsSinceEpoch),
+        blogPostModel.copyWith(createdAt: now.millisecondsSinceEpoch),
       );
     } catch (e) {
       return Future.error(e);
