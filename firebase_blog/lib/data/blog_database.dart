@@ -12,7 +12,9 @@ class BlogDatabase {
       );
 
   late final Stream<QuerySnapshot<BlogPostModel>> _blogPostStream =
-      _blogCollection.snapshots();
+      _blogCollection
+          .orderBy('createdAt', descending: true)
+          .snapshots();
 
   Future<DocumentReference> createBlogPost({
     required BlogPostModel blogPostModel,
@@ -22,9 +24,9 @@ class BlogDatabase {
       final User? user = FirebaseAuth.instance.currentUser;
       final String? userId = user?.uid;
       if (userId == null) {
-        return Future.error("User not authenticated");
+        return await Future.error("User not authenticated");
       }
-      return _blogCollection.add(
+      return await _blogCollection.add(
         blogPostModel.copyWith(
           createdAt: now.millisecondsSinceEpoch,
           userId: userId,

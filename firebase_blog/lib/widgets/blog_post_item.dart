@@ -1,8 +1,6 @@
-import 'package:firebase_blog/data/blog_database.dart';
+import 'package:firebase_blog/widgets/blog_post_profile_header.dart';
 import 'package:flutter/material.dart';
-
 import '../data/blog_post_model.dart';
-import 'edit_blog_post_dialog.dart';
 
 class BlogPostItem extends StatefulWidget {
   const BlogPostItem({super.key, required this.blogDoc, required this.docId});
@@ -15,12 +13,10 @@ class BlogPostItem extends StatefulWidget {
 }
 
 class _BlogPostItemState extends State<BlogPostItem> {
-  final MenuController _menuController = MenuController();
-  final BlogDatabase _database = BlogDatabase();
-
   @override
   Widget build(BuildContext context) {
     BlogPostModel blogDoc = widget.blogDoc;
+    DateTime? createAt = DateTime.fromMillisecondsSinceEpoch(blogDoc.createdAt ?? 0);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Card(
@@ -30,54 +26,7 @@ class _BlogPostItemState extends State<BlogPostItem> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Icon(Icons.person, size: 30),
-                  SizedBox(width: 8),
-                  Text(
-                    "Maung Maung",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  Spacer(),
-                  MenuAnchor(
-                    controller: _menuController,
-                    menuChildren: [
-                      MenuItemButton(
-                        onPressed: () {
-                          _menuController.close();
-                          _editBlogPostDialog(
-                            title: blogDoc.title ?? "",
-                            desc: blogDoc.description ?? "",
-                            docId: widget.docId,
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Text("Edit"),
-                        ),
-                      ),
-                      MenuItemButton(
-                        onPressed: () {
-                          _menuController.close();
-                          _delete();
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Text("Delete"),
-                        ),
-                      ),
-                    ],
-                    builder: (_, _, _) {
-                      return IconButton(
-                        onPressed: () {
-                          _menuController.open();
-                        },
-                        icon: Icon(Icons.more_vert),
-                      );
-                    },
-                  ),
-                ],
-              ),
+              BlogPostProfileHeader(blogDoc: blogDoc, docId: widget.docId),
               Divider(),
               Center(
                 child: Text(
@@ -94,50 +43,31 @@ class _BlogPostItemState extends State<BlogPostItem> {
                   height: 300,
                   fit: BoxFit.cover,
                 ),
+              Divider(),
+              Row(
+                children: [
+                  Expanded(
+                    child: IconButton(onPressed: (){
+                      
+                    }, icon: Icon(Icons.comment)),
+                  ),
+                  Text('|'),
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        '${createAt.day}/${createAt.month}/${createAt.year} ${createAt.hour}:${createAt.minute}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              )
             ],
           ),
         ),
       ),
     );
-  }
-
-  void _editBlogPostDialog({
-    required String title,
-    required String desc,
-    required String docId,
-  }) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return EditBlogPostDialog(title: title, desc: desc, docId: docId);
-      },
-    );
-  }
-
-  void _delete() async {
-    try {
-      await _database.deletePost(widget.docId);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "Delete blog post successfully",
-              style: TextStyle(color: Colors.green),
-            ),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "Failed to delete blog post",
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-        );
-      }
-    }
   }
 }

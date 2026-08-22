@@ -17,4 +17,14 @@ class ProfileDatabase {
       ) async{
    return _profileCollection.add(profileModel);
   }
+  Future<ProfileModel?> getProfile(String uid) async{
+    final snapshot = await _profileCollection
+        .where('uid', isEqualTo: uid)
+        .get();
+    if (snapshot.docs.isNotEmpty) {
+      return snapshot.docs.first.data();
+    } else {
+      return null;
+    }
+  }
 }
