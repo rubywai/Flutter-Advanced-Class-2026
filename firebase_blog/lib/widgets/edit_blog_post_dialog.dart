@@ -5,13 +5,11 @@ import 'package:flutter/material.dart';
 class EditBlogPostDialog extends StatefulWidget {
   const EditBlogPostDialog({
     super.key,
-    required this.title,
-    required this.desc,
+    required this.blogDoc,
     required this.docId,
   });
 
-  final String title;
-  final String desc;
+  final BlogPostModel blogDoc;
   final String docId;
 
   @override
@@ -26,8 +24,8 @@ class _EditBlogPostDialogState extends State<EditBlogPostDialog> {
   @override
   void initState() {
     super.initState();
-    _titleController.text = widget.title;
-    _descriptionController.text = widget.desc;
+    _titleController.text = widget.blogDoc.title ?? "";
+    _descriptionController.text = widget.blogDoc.description ?? "";
   }
 
   @override
@@ -80,7 +78,7 @@ class _EditBlogPostDialogState extends State<EditBlogPostDialog> {
                         _isLoading = true;
                       });
                       await _blogDatabase.updatePost(
-                        blogPostModel: BlogPostModel(
+                        blogPostModel: widget.blogDoc.copyWith(
                           title: _titleController.text,
                           description: _descriptionController.text,
                         ),

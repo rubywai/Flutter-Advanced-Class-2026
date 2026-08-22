@@ -55,8 +55,7 @@ class _BlogPostProfileHeaderState extends State<BlogPostProfileHeader> {
               onPressed: () {
                 _menuController.close();
                 _editBlogPostDialog(
-                  title: blogDoc.title ?? "",
-                  desc: blogDoc.description ?? "",
+                  blogDoc: blogDoc,
                   docId: widget.docId,
                 );
               },
@@ -90,14 +89,13 @@ class _BlogPostProfileHeaderState extends State<BlogPostProfileHeader> {
   }
 
   void _editBlogPostDialog({
-    required String title,
-    required String desc,
+    required BlogPostModel blogDoc,
     required String docId,
   }) {
     showDialog(
       context: context,
       builder: (context) {
-        return EditBlogPostDialog(title: title, desc: desc, docId: docId);
+        return EditBlogPostDialog(blogDoc: blogDoc, docId: docId);
       },
     );
   }

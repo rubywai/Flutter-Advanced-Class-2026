@@ -1,3 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_blog/data/blog_database.dart';
+import 'package:firebase_blog/data/comment_model.dart';
+import 'package:firebase_blog/data/login_utils.dart';
 import 'package:firebase_blog/widgets/blog_post_profile_header.dart';
 import 'package:flutter/material.dart';
 import '../data/blog_post_model.dart';
@@ -13,6 +17,8 @@ class BlogPostItem extends StatefulWidget {
 }
 
 class _BlogPostItemState extends State<BlogPostItem> {
+  final TextEditingController _commentController = TextEditingController();
+  final BlogDatabase _blogDatabase = BlogDatabase();
   @override
   Widget build(BuildContext context) {
     BlogPostModel blogDoc = widget.blogDoc;
@@ -48,6 +54,66 @@ class _BlogPostItemState extends State<BlogPostItem> {
                 children: [
                   Expanded(
                     child: IconButton(onPressed: (){
+                      showDialog(context: context, builder:
+                      (context){
+                        return AlertDialog(
+                          title: Text("Comment"),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              StreamBuilder
+                                <QuerySnapshot<CommentModel>>(stream: _blogDatabase.readComments(widget.docId),
+                                  builder: (context,snapshot){
+                                    if(snapshot.hasError){
+                                      return Icon(Icons.error);
+                                    }
+                                    if(snapshot.hasData){
+                                      final list = snapshot.data?.docs ?? [];
+                                      if(list.isEmpty){
+                                        return Text("No comment!");
+                                      }
+                                      return SizedBox(
+                                        width: 200,
+                                        height: 200,
+                                        child: ListView.builder(
+                                          itemCount: list.length,
+                                            itemBuilder: (context,index){
+                                          final String documentId = list[index].id;
+                                          final CommentModel commentDoc = list[index].data();
+                                          return ListTile(
+                                            title: Text(commentDoc.comment ?? ""),
+                                          );
+                                        }),
+                                      );
+                                    }
+                                    return Center(child: CircularProgressIndicator(),);
+                                  }),
+                              TextField(
+                                controller : _commentController,
+                                decoration: InputDecoration(
+                                  hintText: "Enter your comment",
+                                ),
+                              ),
+                              SizedBox(height: 8)
+                            ],
+                          ),
+                          actions: [
+                            TextButton(onPressed: (){
+                              Navigator.pop(context);
+                              _commentController.clear();
+                            }, child: Text("Cancel"),),
+                            FilledButton(onPressed: (){
+                              _blogDatabase.addComment(widget.docId, CommentModel(
+                                uid: getUser()?.uid ?? "",
+                                comment: _commentController.text,
+                                createdAt: DateTime.now().millisecondsSinceEpoch,
+                              ));
+                              Navigator.pop(context);
+                              _commentController.clear();
+                            }, child: Text("Comment"))
+                          ],
+                        );
+                      });
                       
                     }, icon: Icon(Icons.comment)),
                   ),
