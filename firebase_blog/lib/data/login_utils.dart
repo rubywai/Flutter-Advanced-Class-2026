@@ -35,3 +35,10 @@ void listenAuthState(Function(User?) onChangeAuthState) {
     onChangeAuthState(user);
   });
 }
+
+bool isLogin(){
+  return FirebaseAuth.instance.currentUser != null;
+}
+User? getUser(){
+  return FirebaseAuth.instance.currentUser;
+}

@@ -8,6 +8,7 @@ import 'package:firebase_blog/widgets/edit_blog_post_dialog.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/blog_post_item.dart';
+import 'profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,12 +26,16 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text("Blog App"),
         actions: [
-          IconButton(
-            onPressed: () {
-              FirebaseAuth.instance.signOut();
-            },
-            icon: Icon(Icons.exit_to_app),
-          ),
+          if (isLogin())
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfileScreen()),
+                );
+              },
+              icon: Icon(Icons.person),
+            ),
         ],
       ),
       body: StreamBuilder<QuerySnapshot<BlogPostModel>>(
