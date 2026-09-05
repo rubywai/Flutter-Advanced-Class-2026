@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_blog/analytics/analytics_utils.dart';
 import 'package:firebase_blog/data/blog_database.dart';
 import 'package:firebase_blog/data/comment_model.dart';
 import 'package:firebase_blog/data/login_utils.dart';
 import 'package:firebase_blog/widgets/blog_post_profile_header.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import '../data/blog_post_model.dart';
 
@@ -54,6 +56,7 @@ class _BlogPostItemState extends State<BlogPostItem> {
                 children: [
                   Expanded(
                     child: IconButton(onPressed: (){
+                      AnalyticsUtils.customEvent("view comment", "pressed");
                       showDialog(context: context, builder:
                       (context){
                         return AlertDialog(
@@ -108,11 +111,16 @@ class _BlogPostItemState extends State<BlogPostItem> {
                                 comment: _commentController.text,
                                 createdAt: DateTime.now().millisecondsSinceEpoch,
                               ));
-                              Navigator.pop(context);
+                              Navigator.pop(context,true);
                               _commentController.clear();
                             }, child: Text("Comment"))
                           ],
                         );
+                      })
+                      .then((v){
+                        if(v != true){
+                          FirebaseCrashlytics.instance.log("Cancel the comment");
+                        }
                       });
                       
                     }, icon: Icon(Icons.comment)),

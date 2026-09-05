@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_blog/analytics/analytics_utils.dart';
 import 'package:firebase_blog/data/blog_database.dart';
 import 'package:firebase_blog/data/blog_post_model.dart';
 import 'package:firebase_blog/data/login_utils.dart';
@@ -65,6 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _addBlogPostDialog() {
+    AnalyticsUtils.customEvent("add_blog_post", "pressed");
     showDialog(
       context: context,
       builder: (context) {
