@@ -7,6 +7,19 @@
 - Keep entries grouped by date with newest work added under the current date.
 - Mention commands run for validation when applicable.
 
+## 2026-09-27
+
+### Completed
+
+- Fixed product item bottom overflow risk by limiting product titles to one line, preserving two-line descriptions, reducing bottom padding to 8, and giving grid tiles slightly more vertical space.
+- Added a small fixed gap between product descriptions and the pricing row.
+- Made product item images flexible so text, description spacing, and the pricing row do not overflow vertically on tight grid tiles.
+
+### Verified
+
+- `dart format lib`
+- `flutter analyze`
+
 ## 2026-08-16
 
 ### Completed

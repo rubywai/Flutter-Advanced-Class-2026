@@ -20,15 +20,15 @@ class ProductListItem extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _ProductImage(imageUrl: product.imageUrl),
+              Expanded(child: _ProductImage(imageUrl: product.imageUrl)),
               const SizedBox(height: 12),
               Text(
                 product.name,
-                maxLines: 2,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.titleSmall,
               ),
@@ -41,15 +41,15 @@ class ProductListItem extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
-              const Spacer(),
+              const SizedBox(height: 8),
               Row(
                 children: [
                   Expanded(
                     child: Text(
                       product.displayPrice,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                   DecoratedBox(
@@ -69,10 +69,10 @@ class ProductListItem extends StatelessWidget {
                       child: Text(
                         product.isInStock ? 'In stock' : 'Out of stock',
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: product.isInStock
-                                  ? colorScheme.primary
-                                  : colorScheme.error,
-                            ),
+                          color: product.isInStock
+                              ? colorScheme.primary
+                              : colorScheme.error,
+                        ),
                       ),
                     ),
                   ),
