@@ -9,6 +9,23 @@
 
 ## 2026-09-27
 
+### Product Details And Options
+
+- Added API-backed product details with an immutable model, cancellable Riverpod provider by ID, responsive image gallery, pricing, descriptions, attributes, and categories.
+- Added loading, error, retry, refresh, and stock states; variable-product availability remains unresolved without variation data.
+- Added size, color, and other variation option choosers with Riverpod selection state and recognized color swatches.
+- Cart and checkout integration awaits variation, cart, and checkout API contracts.
+- Formatted product files and passed `flutter analyze`; runtime visual verification remains pending.
+
+### Category List
+
+- Completed by subagent Franklin: replaced the Category placeholder with an API-backed list using `GET /api.php?endpoint=products/categories`.
+- Added an immutable category model, a service using centralized Dio, and a Riverpod provider that fetches all pages in batches of 100.
+- Added category names, product counts, hierarchy paths, images with fallbacks, and loading, error, retry, empty, and pull-to-refresh states.
+- Kept changes inside `lib/features/categories/`; no new dependencies or tests were added.
+- Verified: `dart format lib/features/categories` (subagent), and a fresh `flutter analyze` passed with no issues.
+- Pending: live API and runtime visual verification, including category images and refresh behavior.
+
 ### Completed
 
 - Implemented product list pagination with accumulated pages, near-bottom loading, pull-to-refresh reset, and load-more retry handling.
