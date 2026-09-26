@@ -16,47 +16,103 @@ class ProductsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Products')),
       body: RefreshIndicator(
-        onRefresh: () => ref.refresh(productsProvider.future),
+        onRefresh: () => ref.read(productsProvider.notifier).refresh(),
         child: productsAsync.when(
           loading: () =>
               const _CenteredState(child: CircularProgressIndicator()),
           error: (error, stackTrace) =>
               _ErrorView(onRetry: () => ref.invalidate(productsProvider)),
-          data: (products) {
+          data: (productsState) {
+            final products = productsState.products;
+
             if (products.isEmpty) {
               return const _CenteredState(child: _EmptyViewContent());
             }
 
-            return CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                SliverPadding(
-                  padding: const EdgeInsets.all(16),
-                  sliver: SliverGrid(
-                    gridDelegate:
-                        const SliverGridDelegateWithMaxCrossAxisExtent(
-                          maxCrossAxisExtent: 240,
-                          mainAxisSpacing: 12,
-                          crossAxisSpacing: 12,
-                          childAspectRatio: 0.68,
-                        ),
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      final product = products[index];
+            return NotificationListener<ScrollNotification>(
+              onNotification: (notification) {
+                if (notification.metrics.extentAfter < 600) {
+                  ref.read(productsProvider.notifier).loadNextPage();
+                }
 
-                      return ProductListItem(
-                        product: product,
-                        onTap: () =>
-                            context.go('${AppRoutes.products}/${product.id}'),
-                      );
-                    }, childCount: products.length),
+                return false;
+              },
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  SliverPadding(
+                    padding: const EdgeInsets.all(16),
+                    sliver: SliverGrid(
+                      gridDelegate:
+                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 240,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            childAspectRatio: 0.68,
+                          ),
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final product = products[index];
+
+                        return ProductListItem(
+                          product: product,
+                          onTap: () =>
+                              context.go('${AppRoutes.products}/${product.id}'),
+                        );
+                      }, childCount: products.length),
+                    ),
                   ),
-                ),
-              ],
+                  SliverToBoxAdapter(
+                    child: _PaginationFooter(
+                      isLoading: productsState.isLoadingMore,
+                      error: productsState.loadMoreError,
+                      onRetry: () =>
+                          ref.read(productsProvider.notifier).loadNextPage(),
+                    ),
+                  ),
+                ],
+              ),
             );
           },
         ),
       ),
     );
+  }
+}
+
+class _PaginationFooter extends StatelessWidget {
+  const _PaginationFooter({
+    required this.isLoading,
+    required this.error,
+    required this.onRetry,
+  });
+
+  final bool isLoading;
+  final Object? error;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Padding(
+        padding: EdgeInsets.fromLTRB(16, 8, 16, 24),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (error != null) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+        child: Center(
+          child: TextButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh),
+            label: const Text('Load more'),
+          ),
+        ),
+      );
+    }
+
+    return const SizedBox(height: 16);
   }
 }
 

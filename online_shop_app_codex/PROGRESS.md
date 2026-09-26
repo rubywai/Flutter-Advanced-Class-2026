@@ -11,6 +11,8 @@
 
 ### Completed
 
+- Implemented product list pagination with accumulated pages, near-bottom loading, pull-to-refresh reset, and load-more retry handling.
+- Added project-local `.codex/rules/git-workflow.rules` Git execution policy to allow `git add` and `git commit` without extra approval while prompting for `git push`.
 - Fixed product item bottom overflow risk by limiting product titles to one line, preserving two-line descriptions, reducing bottom padding to 8, and giving grid tiles slightly more vertical space.
 - Added a small fixed gap between product descriptions and the pricing row.
 - Made product item images flexible so text, description spacing, and the pricing row do not overflow vertically on tight grid tiles.
