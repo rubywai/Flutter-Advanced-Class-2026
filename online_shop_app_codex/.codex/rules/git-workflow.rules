@@ -1,0 +1,17 @@
+prefix_rule(
+    pattern = ["git", "add"],
+    decision = "allow",
+    justification = "Project-local rule: staging changes is allowed without extra approval.",
+)
+
+prefix_rule(
+    pattern = ["git", "commit"],
+    decision = "allow",
+    justification = "Project-local rule: creating commits is allowed without extra approval.",
+)
+
+prefix_rule(
+    pattern = ["git", "push"],
+    decision = "prompt",
+    justification = "Project-local rule: pushing changes requires explicit approval.",
+)
