@@ -9,6 +9,18 @@
 
 ## 2026-10-02
 
+### Authentication Flow
+
+- Added form-encoded registration, OTP verification, login, logout, and password-reset request flows against `auth.php`.
+- Added Riverpod session state with JWT and expiry persistence through `shared_preferences`; authenticated requests receive a bearer token.
+- Added public login, registration, OTP, and reset routes with redirect support for future protected checkout/order routes.
+- Added a reusable `requireAuthentication` route redirect helper for the future checkout/order route.
+- Verified with `dart format` and `flutter analyze` (no issues).
+- Profile now shows a login action for signed-out users and logout for active sessions, with a return path to the profile screen after login.
+- Auth registration, login, OTP verification, and reset now all send JSON because the API returns `Invalid JSON body` for form-encoded requests.
+- Normalized API error and reset messages so auth screens show readable text instead of raw JSON responses.
+- Reset success now appears in a confirmation dialog with the server message.
+
 ### Category Products, Search, And SQLite Cart
 
 - Implemented in parallel by Galileo (category products), Copernicus (search), and Maxwell (local cart), with shared query, routing, and integration work in the main thread.

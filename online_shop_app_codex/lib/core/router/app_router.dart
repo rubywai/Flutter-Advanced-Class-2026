@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/auth/presentation/auth_screens.dart';
+import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/cart/presentation/cart_screen.dart';
 import '../../features/categories/presentation/categories_screen.dart';
 import '../../features/categories/presentation/category_products_screen.dart';
@@ -12,9 +14,34 @@ import 'app_navigation_shell.dart';
 import 'app_routes.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
+  final auth = ref.watch(authProvider);
   return GoRouter(
     initialLocation: AppRoutes.home,
     routes: [
+      GoRoute(
+        path: AppRoutes.login,
+        builder: (context, state) =>
+            LoginScreen(redirect: state.uri.queryParameters['redirect']),
+      ),
+      GoRoute(
+        path: AppRoutes.register,
+        builder: (context, state) =>
+            RegisterScreen(redirect: state.uri.queryParameters['redirect']),
+      ),
+      GoRoute(
+        path: AppRoutes.verify,
+        builder: (context, state) {
+          final data = state.extra as Map<String, String?>?;
+          return VerifyScreen(
+            email: data?['email'] ?? state.uri.queryParameters['email'] ?? '',
+            redirect: data?['redirect'],
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.reset,
+        builder: (context, state) => const ResetScreen(),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return AppNavigationShell(navigationShell: navigationShell);
@@ -88,5 +115,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         ],
       ),
     ],
+    redirect: (context, state) {
+      final isAuthRoute = state.matchedLocation.startsWith('/auth/');
+      if (auth.isLoading || !auth.hasValue) return null;
+      if (auth.value!.isAuthenticated && isAuthRoute) return AppRoutes.home;
+      return null;
+    },
   );
 });

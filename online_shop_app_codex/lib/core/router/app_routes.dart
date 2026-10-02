@@ -12,4 +12,8 @@ class AppRoutes {
   static const productDetailsName = 'productDetails';
   static const categoryProductsName = 'categoryProducts';
   static const categoryProducts = '/categories/:categoryId/products';
+  static const login = '/auth/login';
+  static const register = '/auth/register';
+  static const verify = '/auth/verify';
+  static const reset = '/auth/reset';
 }
