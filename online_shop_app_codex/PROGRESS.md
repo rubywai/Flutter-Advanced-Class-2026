@@ -21,6 +21,17 @@
 - Normalized API error and reset messages so auth screens show readable text instead of raw JSON responses.
 - Reset success now appears in a confirmation dialog with the server message.
 
+### Customer Profile
+
+- Added customer models and API service for `GET` and JSON `PUT` requests to `api.php?endpoint=customers/{id}`.
+- Login sessions now retain the customer ID from the response or JWT claim, including persistence across app restarts.
+- Profile now loads customer information after login, supports refresh, displays billing and shipping details, and provides logout.
+- Added a dedicated profile edit form for names and billing fields; shipping and account email remain read-only.
+- Verified with `dart format lib/features/profile` and `flutter analyze` (no issues).
+- Fixed restored sessions from older logins by deriving and persisting the customer ID from the saved JWT claim.
+- Hardened customer loading for both flat customer responses and `{success, data}` envelopes; missing session IDs now show a clear re-login error.
+- Added shipping address fields to the profile edit form and included the shipping object in customer update requests.
+
 ### Category Products, Search, And SQLite Cart
 
 - Implemented in parallel by Galileo (category products), Copernicus (search), and Maxwell (local cart), with shared query, routing, and integration work in the main thread.

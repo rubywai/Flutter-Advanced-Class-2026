@@ -39,12 +39,28 @@ class AuthService {
       throw const AuthException('Login succeeded without a session token.');
     }
     final expiry = int.tryParse('${nested['exp'] ?? data['exp'] ?? 0}') ?? 0;
+    final userId = int.tryParse(
+      '${nested['id'] ?? data['id'] ?? _jwtClaim(token, 'id') ?? ''}',
+    );
     return AuthSession(
       token: token,
       expiresAt: expiry > 0
           ? DateTime.fromMillisecondsSinceEpoch(expiry * 1000)
           : null,
+      userId: userId,
     );
+  }
+
+  String? _jwtClaim(String token, String key) {
+    try {
+      final parts = token.split('.');
+      if (parts.length < 2) return null;
+      final normalized = base64Url.normalize(parts[1]);
+      final payload = jsonDecode(utf8.decode(base64Url.decode(normalized)));
+      return payload is Map ? payload[key]?.toString() : null;
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<String> reset(String email) async {
@@ -107,9 +123,10 @@ class AuthService {
 }
 
 class AuthSession {
-  const AuthSession({required this.token, this.expiresAt});
+  const AuthSession({required this.token, this.expiresAt, this.userId});
   final String token;
   final DateTime? expiresAt;
+  final int? userId;
 }
 
 class AuthException implements Exception {
