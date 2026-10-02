@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/models/product_detail.dart';
+import '../../cart/presentation/widgets/add_to_cart_control.dart';
 import 'providers/product_detail_provider.dart';
 import 'widgets/product_detail_gallery.dart';
 import 'widgets/product_option_chooser.dart';
@@ -60,42 +61,62 @@ class ProductDetailsScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            data: (detail) => SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(16),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1100),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final gallery = ProductDetailGallery(
-                        key: ValueKey(detail.id),
-                        images: detail.images,
-                        productName: detail.name,
-                      );
-                      final information = _ProductInformation(product: detail);
-                      if (constraints.maxWidth >= 760) {
-                        return Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: gallery),
-                            const SizedBox(width: 32),
-                            Expanded(child: information),
-                          ],
-                        );
-                      }
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          gallery,
-                          const SizedBox(height: 24),
-                          information,
-                        ],
-                      );
-                    },
+            data: (detail) => Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(16),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 1100),
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final gallery = ProductDetailGallery(
+                              key: ValueKey(detail.id),
+                              images: detail.images,
+                              productName: detail.name,
+                            );
+                            final information = _ProductInformation(
+                              product: detail,
+                            );
+                            if (constraints.maxWidth >= 760) {
+                              return Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(child: gallery),
+                                  const SizedBox(width: 32),
+                                  Expanded(child: information),
+                                ],
+                              );
+                            }
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                gallery,
+                                const SizedBox(height: 24),
+                                information,
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                SafeArea(
+                  top: false,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 1100),
+                        child: AddToCartControl(product: detail),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),

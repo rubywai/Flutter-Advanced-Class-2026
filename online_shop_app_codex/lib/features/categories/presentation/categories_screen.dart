@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../core/router/app_routes.dart';
 import 'providers/categories_providers.dart';
 
 class CategoriesScreen extends ConsumerWidget {
@@ -64,43 +66,50 @@ class CategoriesScreen extends ConsumerWidget {
               itemBuilder: (context, index) {
                 final entry = entries[index];
                 final category = entry.category;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
+                return InkWell(
+                  onTap: () => context.pushNamed(
+                    AppRoutes.categoryProductsName,
+                    pathParameters: {'categoryId': category.id.toString()},
+                    queryParameters: {'name': category.name},
                   ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _CategoryImage(
-                        url: category.image?.src,
-                        alt: category.image?.alt,
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              category.name,
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            if (entry.parentPath.isNotEmpty) ...[
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _CategoryImage(
+                          url: category.image?.src,
+                          alt: category.image?.alt,
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                category.name,
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              if (entry.parentPath.isNotEmpty) ...[
+                                const SizedBox(height: 4),
+                                Text(
+                                  entry.parentPath,
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                              ],
                               const SizedBox(height: 4),
                               Text(
-                                entry.parentPath,
-                                style: Theme.of(context).textTheme.bodySmall,
+                                '${category.count} ${category.count == 1 ? 'product' : 'products'}',
+                                style: Theme.of(context).textTheme.bodyMedium,
                               ),
                             ],
-                            const SizedBox(height: 4),
-                            Text(
-                              '${category.count} ${category.count == 1 ? 'product' : 'products'}',
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               },

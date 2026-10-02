@@ -7,6 +7,24 @@
 - Keep entries grouped by date with newest work added under the current date.
 - Mention commands run for validation when applicable.
 
+## 2026-10-02
+
+### Category Products, Search, And SQLite Cart
+
+- Implemented in parallel by Galileo (category products), Copernicus (search), and Maxwell (local cart), with shared query, routing, and integration work in the main thread.
+- Category rows now open paginated product results; Home has an app-bar search icon opening global search with 400 ms debounce, immediate submission, clear, and empty-query handling.
+- Shared query-keyed results preserve separate Home/category/search state, cancel disposed requests, ignore stale page responses after refresh, deduplicate products, and retain results for load-more retries.
+- Added Android/iOS SQLite cart storage using `sqflite`, serialized transactional writes, exact decimal totals, quantity controls, removal, and persisted price/stock snapshots.
+- Product details offer quantity selection and add-to-cart for simple products and selected variable-product options; the already-loaded price/stock snapshot and existing cart quantities are checked locally before insertion. Cart rows distinguish product variations and preserve their selected options.
+- Added generated native plugin setup and documented category/search API parameters in `api_doc.md`.
+- Verified: `dart format lib`, `flutter analyze` (no issues), `git diff --check`, and `flutter build apk --debug`.
+- Installed the debug APK on the Android emulator; confirmed search results, category navigation/results/images, cart empty state, and creation of `shop_cart.db`.
+- Live API checks returned category results and distinct search pages. The current 88-product catalog returned only variable products, so real simple-product add/update/restart persistence verification remains pending.
+- Pending: iOS runtime checks, populated-cart failure/restart checks with a simple product, and narrow-width/increased-text-scale visual coverage.
+- Build warnings: existing Gradle/AGP/Kotlin versions will need a future upgrade; the current debug build succeeds.
+- Follow-up: kept Add to cart visible in a fixed bottom area on product details; variable products display the disabled action and availability reason. Rebuilt, reinstalled, and confirmed it is visible on the first screen of the emulator detail view.
+- Follow-up: variable-product options resolve against the product's listed variation IDs; selected variation price and stock govern add-to-cart, which only writes to SQLite and does not fetch product data. Each variation persists as a distinct cart line. Verified with `flutter analyze` and `git diff --check`.
+
 ## 2026-09-27
 
 ### Product Details And Options

@@ -59,12 +59,6 @@ class ProductOptionChooser extends ConsumerWidget {
                 .join(' / '),
           ),
         ],
-        const SizedBox(height: 12),
-        Text(
-          complete
-              ? 'Price and availability for this combination are not yet available.'
-              : 'Variation price and availability are not yet available.',
-        ),
       ],
     );
   }

@@ -31,6 +31,12 @@ class ProductDetail {
               (item) => item['visible'] == true || item['variation'] == true,
             )
             .map(ProductDetailAttribute.fromJson),
+      ),
+      variationIds = List.unmodifiable(
+        (json['variations'] as List? ?? const [])
+            .whereType<num>()
+            .map((id) => id.toInt())
+            .where((id) => id > 0),
       );
 
   final int id;
@@ -42,12 +48,13 @@ class ProductDetail {
   final List<ProductDetailImage> images;
   final List<String> categories;
   final List<ProductDetailAttribute> attributes;
+  final List<int> variationIds;
 
   String get displayPrice => price.isEmpty ? 'Price unavailable' : '$price Ks';
 
   String get availability {
     if (type == 'variable') {
-      return 'Availability varies by option; variation stock is not available.';
+      return 'Select options to check price and availability.';
     }
     if (manageStock) {
       final quantity = stockQuantity;
@@ -65,6 +72,54 @@ class ProductDetail {
 
   static Iterable<Map<String, dynamic>> _objects(dynamic value) =>
       value is List ? value.whereType<Map<String, dynamic>>() : const [];
+}
+
+class ProductVariation {
+  ProductVariation.fromJson(Map<String, dynamic> json)
+    : id = json['id'] as int,
+      price = json['price'] as String? ?? '',
+      regularPrice = json['regular_price'] as String? ?? '',
+      onSale = json['on_sale'] as bool? ?? false,
+      stockStatus = json['stock_status'] as String? ?? '',
+      manageStock = json['manage_stock'] as bool? ?? false,
+      stockQuantity = json['stock_quantity'] as int?,
+      backordersAllowed = json['backorders_allowed'] as bool? ?? false,
+      attributes = Map.unmodifiable({
+        for (final item in ProductDetail._objects(json['attributes']))
+          (item['name'] as String? ?? item['slug'] as String? ?? '')
+              .trim()
+              .toLowerCase(): productPlainText(
+            item['option'] as String? ?? '',
+          ),
+      });
+
+  final int id;
+  final String price, regularPrice, stockStatus;
+  final bool onSale, manageStock, backordersAllowed;
+  final int? stockQuantity;
+  final Map<String, String> attributes;
+
+  String get availability {
+    if (manageStock) {
+      if (stockQuantity == null) return 'Stock availability unknown';
+      if (stockQuantity! > 0) return 'In stock ($stockQuantity available)';
+      return backordersAllowed ? 'Available on backorder' : 'Out of stock';
+    }
+    return switch (stockStatus) {
+      'instock' => 'In stock',
+      'outofstock' =>
+        backordersAllowed ? 'Available on backorder' : 'Out of stock',
+      'onbackorder' => 'Available on backorder',
+      _ => 'Stock availability unknown',
+    };
+  }
+
+  bool get isAvailable {
+    if (manageStock) {
+      return (stockQuantity ?? 0) > 0 || backordersAllowed;
+    }
+    return stockStatus == 'instock' || stockStatus == 'onbackorder';
+  }
 }
 
 class ProductDetailImage {

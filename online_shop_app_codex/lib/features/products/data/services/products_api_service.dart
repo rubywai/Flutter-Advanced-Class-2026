@@ -21,7 +21,7 @@ class ProductsApiService {
       queryParameters: {
         'endpoint': 'products/$productId',
         '_fields':
-            'id,name,price,regular_price,on_sale,description,short_description,type,stock_status,manage_stock,stock_quantity,backorders_allowed,sku,average_rating,rating_count,images,categories,attributes',
+            'id,name,price,regular_price,on_sale,description,short_description,type,stock_status,manage_stock,stock_quantity,backorders,backorders_allowed,sku,average_rating,rating_count,images,categories,attributes,variations',
       },
       cancelToken: cancelToken,
     );
@@ -32,11 +32,35 @@ class ProductsApiService {
     return ProductDetail.fromJson(data);
   }
 
+  Future<ProductVariation> getVariation(
+    int id, {
+    CancelToken? cancelToken,
+  }) async {
+    if (id <= 0) throw const FormatException('Invalid variation ID');
+    final response = await _dio.get<Map<String, dynamic>>(
+      '/api.php',
+      queryParameters: {
+        'endpoint': 'products/$id',
+        '_fields':
+            'id,attributes,price,regular_price,sale_price,on_sale,stock_status,manage_stock,stock_quantity,backorders,backorders_allowed',
+      },
+      cancelToken: cancelToken,
+    );
+    final data = response.data;
+    if (data == null || data['id'] != id) {
+      throw const FormatException('Invalid variation response');
+    }
+    return ProductVariation.fromJson(data);
+  }
+
   Future<List<Product>> getProducts({
     int page = 1,
     int perPage = 10,
     String orderBy = 'date',
     String order = 'desc',
+    int? categoryId,
+    String? search,
+    CancelToken? cancelToken,
   }) async {
     final response = await _dio.get<List<dynamic>>(
       '/api.php',
@@ -46,7 +70,10 @@ class ProductsApiService {
         'per_page': perPage,
         'orderby': orderBy,
         'order': order,
+        'category': ?categoryId,
+        if (search != null && search.trim().isNotEmpty) 'search': search.trim(),
       },
+      cancelToken: cancelToken,
     );
 
     final data = response.data ?? const [];
