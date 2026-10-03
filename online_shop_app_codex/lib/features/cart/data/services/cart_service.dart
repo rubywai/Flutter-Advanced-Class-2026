@@ -183,4 +183,42 @@ class CartService {
       return _read(txn);
     });
   });
+
+  Future<List<CartItem>> clear() => _serial(() async {
+    final db = await _database();
+    return db.transaction((txn) async {
+      await txn.delete('cart_items');
+      return _read(txn);
+    });
+  });
+  Future<List<CartItem>> removePurchased(List<CartItem> purchased) =>
+      _serial(() async {
+        final db = await _database();
+        return db.transaction((txn) async {
+          for (final item in purchased) {
+            final rows = await txn.query(
+              'cart_items',
+              where: 'product_id = ? AND variation_id = ?',
+              whereArgs: [item.productId, item.variationId],
+            );
+            if (rows.isEmpty) continue;
+            final remaining = (rows.first['quantity'] as int) - item.quantity;
+            if (remaining <= 0) {
+              await txn.delete(
+                'cart_items',
+                where: 'product_id = ? AND variation_id = ?',
+                whereArgs: [item.productId, item.variationId],
+              );
+            } else {
+              await txn.update(
+                'cart_items',
+                {'quantity': remaining},
+                where: 'product_id = ? AND variation_id = ?',
+                whereArgs: [item.productId, item.variationId],
+              );
+            }
+          }
+          return _read(txn);
+        });
+      });
 }

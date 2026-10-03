@@ -52,4 +52,8 @@ class CartNotifier extends AsyncNotifier<List<CartItem>> {
       _mutate(() => ref.read(cartServiceProvider).remove(id, 0));
   Future<void> removeLine(int id, int variationId) =>
       _mutate(() => ref.read(cartServiceProvider).remove(id, variationId));
+
+  Future<void> clear() => _mutate(() => ref.read(cartServiceProvider).clear());
+  Future<void> removePurchased(List<CartItem> items) =>
+      _mutate(() => ref.read(cartServiceProvider).removePurchased(items));
 }

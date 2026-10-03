@@ -7,6 +7,72 @@
 - Keep entries grouped by date with newest work added under the current date.
 - Mention commands run for validation when applicable.
 
+## 2026-10-03
+
+### Green Shopping App Icon
+
+- Generated an emerald-green shopping-bag app icon using the built-in ImageGen tool; saved the 1024px master and generation prompt in assets/app_icon/.
+- Replaced all five Android launcher density resources and all fifteen iOS AppIcon PNG files using the existing platform icon references and catalog.
+- Verified every native icon's required pixel dimensions and opaque background, flutter analyze (no issues), and git diff --check. No dependencies added; device launcher and iOS build verification remain pending.
+
+
+### Selected Product Option Loading
+
+- Added a visible progress bar and loading spinner in the fixed product-detail purchase area while the selected size/color combination resolves.
+- Shows Loading price and availability; quantity and Add to cart controls stay disabled during lookup, and stale variation pricing is hidden. Option selectors remain available so selection changes can cancel previous lookups.
+- Verified: dart format, flutter analyze (no issues), and git diff --check. Runtime visual verification remains pending.
+
+
+### Customer Profile Presentation
+
+- Improved the account header with a themed background, avatar fallback, clearer name/email hierarchy, and suppression of duplicate username/email text.
+- Added separate Billing address and Shipping address cards with icons, subtitles, and explicit labels for names, address lines, city, state/region, postcode, country, and supplied contact fields. Missing address values show Not provided.
+- Address fields adapt from two columns to one on narrow screens or with larger text; refresh, editing, My Orders access, and logout during customer failures remain available.
+- Verified: dart format, flutter analyze (no issues), and git diff --check. Runtime visual verification remains pending.
+
+
+### Rich Order Cards And Status Tabs
+
+- Extended order line parsing for the supplied live response: product names, parent names, image.src, numeric unit prices, decimal line totals, and display option metadata.
+- Redesigned orders with rounded cards, product photos and image fallbacks, Size/Color badges, colored status badges, readable dates, grouped prices, and distinct item/order totals. Minimal API responses retain product/variation ID fallbacks; narrow layouts and larger text stack product details.
+- Added swipeable All, Pending, Processing, and Completed tabs using the API status parameter; All omits it. Requests are keyed by session and status, with independent loading/error/empty/refresh handling and scroll positions. Checkout opens All after successful cleanup.
+- Verified order tab changes with flutter analyze (no issues), flutter build apk --debug, git diff --check, and an offline status-query simulation (All omits status; pending/processing/completed send it). Debug APK installed on emulator-5554; populated-card/tab visual verification remains pending.
+- Updated api_doc.md. Verified supplied rich/minimal response parsing with a temporary local Dart probe; no test files or live orders were created.
+
+### My Orders And Checkout Navigation
+
+- Added a My Orders row under Profile, independent of customer information loading/error states, and an authenticated /profile/orders route in the Profile navigation branch.
+- Added session-scoped Riverpod order loading using GET orders with the customer ID string and documented field selection; missing IDs never make unfiltered requests, session changes discard prior data, and disposed requests are cancelled.
+- Added newest-first order cards with number, status (including checkout-draft), date, MMK total, and product/variation IDs and quantities; loading, empty, error/retry, refresh, and logout states are supported.
+- Checkout now automatically opens My Orders once after creation and successful cart cleanup, refreshing orders and showing a creation banner. Cleanup failures retain recovery and navigate after retry succeeds. The submitted checkout is removed from navigation history.
+- Updated api_doc.md with the order-list contract and navigation behavior.
+- Verified: dart format, flutter analyze (no issues), git diff --check, flutter build apk --debug, and an offline Dio simulation covering customer/field parameters, multiple orders/date ordering, checkout-draft, simple/variation summaries, empty data, malformed responses, invalid authentication, and missing customer ID. No test files or live orders were created.
+- Debug APK installed on emulator-5554; visually verified My Orders empty state, refresh/logout actions, Profile tab selection, back navigation to Profile, and the Profile My Orders entry. Full successful checkout-to-list navigation, cleanup-failure recovery, account switching, populated-list visual coverage, and iOS verification remain pending. Existing Android build-tool upgrade warnings remain.
+
+### Shipping Zone Correction
+
+- Updated checkout shipping-method requests to zone 2 because zone 1 is unavailable; updated api_doc.md.
+- Verified: flutter analyze (no issues) and git diff --check.
+
+### Logout During Customer Loading Failures
+
+- Added an always-visible logout action to the signed-in Profile app bar, including customer loading, error, and unavailable states.
+- Added logout to Checkout before order creation, including customer-fetch failures; disabled it during order submission. Uses existing session/token clearing and authenticated-route redirects.
+- Verified: dart format, flutter analyze (no issues), and git diff --check.
+
+### Checkout And Order Creation
+
+- Added an authenticated checkout route and a Checkout button below the populated cart subtotal, with login return navigation.
+- Added checkout-only editable customer shipping/billing details, Myanmar country restriction, billing-same-as-shipping option, email/phone validation, and optional customer note.
+- Added enabled shipping-method loading from zone 1, explicit selection, flat-rate/free-shipping cost handling, and exact-decimal estimated totals.
+- Added JSON Cash on Delivery order creation using existing bearer authentication; simple and variation cart lines map to documented request fields without local prices or customer_id.
+- Added submission/navigation guards, readable rejection messages, explicit confirmation for uncertain-result retries, and server order ID/status/currency/totals confirmation, including checkout-draft.
+- Added transactional removal of purchased quantities, preserving remaining quantities and unrelated lines; cleanup failures retain the successful order and retry cleanup without another POST.
+- Updated api_doc.md with shipping and order contracts and current cart behavior. Existing uncommitted cart clear helpers were preserved.
+- Verified: dart format, flutter analyze (no issues), git diff --check, and a temporary offline Dio response simulation for enabled/invalid/free/flat-rate methods, decimal totals, simple/variation payloads, creation success, rejection, timeout, and unreadable responses. No test files were added and no live orders were created.
+- Android debug APK built successfully and installed on emulator-5554; checkout deep link opens and customer loading/error/retry layout was visually inspected. The emulator customer request failed, preventing populated-form runtime checks. Existing Gradle/AGP/Kotlin upgrade warnings remain.
+- Pending: full emulator/runtime checkout validation (login return, address forms, cleanup/restart behavior, narrow widths, large text), iOS checks, and live order verification with explicit authorization.
+
 ## 2026-10-02
 
 ### Authentication Flow

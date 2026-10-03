@@ -10,6 +10,9 @@ import '../../features/products/presentation/product_search_screen.dart';
 import '../../features/products/presentation/product_details_screen.dart';
 import '../../features/products/presentation/products_screen.dart';
 import '../../features/profile/presentation/settings_screen.dart';
+import '../../features/checkout/presentation/checkout_screen.dart';
+import '../../features/orders/presentation/orders_screen.dart';
+import 'auth_guard.dart';
 import 'app_navigation_shell.dart';
 import 'app_routes.dart';
 
@@ -18,6 +21,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: AppRoutes.home,
     routes: [
+      GoRoute(
+        path: AppRoutes.checkout,
+        name: AppRoutes.checkoutName,
+        builder: (context, state) => const CheckoutScreen(),
+      ),
       GoRoute(
         path: AppRoutes.login,
         builder: (context, state) =>
@@ -109,6 +117,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: AppRoutes.profile,
                 name: 'profile',
                 builder: (context, state) => const SettingsScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'orders',
+                    name: AppRoutes.ordersName,
+                    builder: (context, state) => OrdersScreen(
+                      createdOrderId: int.tryParse(
+                        state.uri.queryParameters['createdOrderId'] ?? '',
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -116,9 +135,23 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
     ],
     redirect: (context, state) {
+      if ((state.matchedLocation == AppRoutes.checkout ||
+              state.matchedLocation == AppRoutes.orders) &&
+          auth.hasValue) {
+        final redirect = requireAuthentication(auth.value!, state);
+        if (redirect != null) return redirect;
+      }
       final isAuthRoute = state.matchedLocation.startsWith('/auth/');
       if (auth.isLoading || !auth.hasValue) return null;
-      if (auth.value!.isAuthenticated && isAuthRoute) return AppRoutes.home;
+      if (auth.value!.isAuthenticated && isAuthRoute) {
+        final target = state.uri.queryParameters['redirect'];
+        return target != null &&
+                target.startsWith('/') &&
+                !target.startsWith('//') &&
+                !target.startsWith('/auth/')
+            ? target
+            : AppRoutes.home;
+      }
       return null;
     },
   );

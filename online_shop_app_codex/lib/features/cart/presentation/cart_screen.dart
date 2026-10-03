@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/router/app_routes.dart';
 
 import '../data/models/cart_item.dart';
 import 'providers/cart_provider.dart';
@@ -202,9 +204,21 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   padding: const EdgeInsets.all(16),
                   child: SizedBox(
                     width: double.infinity,
-                    child: Text(
-                      'Subtotal: $subtotal Ks',
-                      style: Theme.of(context).textTheme.titleMedium,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'Subtotal: $subtotal Ks',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 12),
+                        FilledButton(
+                          onPressed: _busy
+                              ? null
+                              : () => context.pushNamed(AppRoutes.checkoutName),
+                          child: const Text('Checkout'),
+                        ),
+                      ],
                     ),
                   ),
                 ),
