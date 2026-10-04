@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/book_library_database/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/book_library_database/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/book_library_database/build" />
+      <excludeFolder url="file://$MODULE_DIR$/book_library_database/ios/.symlinks/plugins/image_picker_ios/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/book_library_database/ios/.symlinks/plugins/image_picker_ios/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/book_library_database/ios/.symlinks/plugins/image_picker_ios/build" />
+      <excludeFolder url="file://$MODULE_DIR$/book_library_database/ios/.symlinks/plugins/image_picker_ios/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/book_library_database/ios/.symlinks/plugins/image_picker_ios/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/book_library_database/ios/.symlinks/plugins/image_picker_ios/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/book_library_database/ios/.symlinks/plugins/sqflite_darwin/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/book_library_database/ios/.symlinks/plugins/sqflite_darwin/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/book_library_database/ios/.symlinks/plugins/sqflite_darwin/build" />
+      <excludeFolder url="file://$MODULE_DIR$/book_library_database/ios/.symlinks/plugins/sqflite_darwin/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/book_library_database/ios/.symlinks/plugins/sqflite_darwin/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/book_library_database/ios/.symlinks/plugins/sqflite_darwin/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/dart-programming-language/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/dart-programming-language/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/dart-programming-language/build" />
+      <excludeFolder url="file://$MODULE_DIR$/engineering_dictionary_app/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/engineering_dictionary_app/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/engineering_dictionary_app/build" />
+      <excludeFolder url="file://$MODULE_DIR$/engineering_dictionary_app/ios/.symlinks/plugins/sqflite_darwin/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/engineering_dictionary_app/ios/.symlinks/plugins/sqflite_darwin/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/engineering_dictionary_app/ios/.symlinks/plugins/sqflite_darwin/build" />
+      <excludeFolder url="file://$MODULE_DIR$/engineering_dictionary_app/ios/.symlinks/plugins/sqflite_darwin/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/engineering_dictionary_app/ios/.symlinks/plugins/sqflite_darwin/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/engineering_dictionary_app/ios/.symlinks/plugins/sqflite_darwin/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/file_explorer/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/file_explorer/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/file_explorer/build" />
+      <excludeFolder url="file://$MODULE_DIR$/file_explorer/ios/.symlinks/plugins/file_saver/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/file_explorer/ios/.symlinks/plugins/file_saver/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/file_explorer/ios/.symlinks/plugins/file_saver/build" />
+      <excludeFolder url="file://$MODULE_DIR$/file_explorer/ios/.symlinks/plugins/file_saver/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/file_explorer/ios/.symlinks/plugins/file_saver/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/file_explorer/ios/.symlinks/plugins/file_saver/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/local_llm_ai_agent/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/local_llm_ai_agent/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/local_llm_ai_agent/build" />
+      <excludeFolder url="file://$MODULE_DIR$/material_lesson/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/material_lesson/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/material_lesson/build" />
+      <excludeFolder url="file://$MODULE_DIR$/material_lesson/ios/.symlinks/plugins/url_launcher_ios/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/material_lesson/ios/.symlinks/plugins/url_launcher_ios/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/material_lesson/ios/.symlinks/plugins/url_launcher_ios/build" />
+      <excludeFolder url="file://$MODULE_DIR$/material_lesson/ios/.symlinks/plugins/url_launcher_ios/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/material_lesson/ios/.symlinks/plugins/url_launcher_ios/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/material_lesson/ios/.symlinks/plugins/url_launcher_ios/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/media_content_library_app/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/media_content_library_app/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/media_content_library_app/build" />
+      <excludeFolder url="file://$MODULE_DIR$/river_pod_counter/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/river_pod_counter/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/river_pod_counter/build" />
+      <excludeFolder url="file://$MODULE_DIR$/student_form_mini_project/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/student_form_mini_project/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/student_form_mini_project/build" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

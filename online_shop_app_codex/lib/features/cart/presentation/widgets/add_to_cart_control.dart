@@ -83,7 +83,9 @@ class _AddToCartControlState extends ConsumerState<AddToCartControl> {
     final variationAsync = query == null
         ? null
         : ref.watch(productVariationProvider(query));
-    final variation = variationAsync?.asData?.value;
+    final checkingOption =
+        isVariable && complete && variationAsync?.isLoading == true;
+    final variation = checkingOption ? null : variationAsync?.asData?.value;
 
     final existing =
         ref.watch(cartProvider).asData?.value ?? const <CartItem>[];
@@ -113,7 +115,7 @@ class _AddToCartControlState extends ConsumerState<AddToCartControl> {
       status =
           'Select ${variationAttributes.map((a) => a.name).join(' and ')}.';
     } else if (variationAsync?.isLoading == true) {
-      status = 'Checking selected option...';
+      status = 'Loading price and availability…';
     } else if (variationAsync?.hasError == true) {
       status = 'Could not check this option. Retry below.';
     } else if (isVariable && variation == null && complete) {
@@ -128,6 +130,14 @@ class _AddToCartControlState extends ConsumerState<AddToCartControl> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        if (checkingOption)
+          const Padding(
+            padding: EdgeInsets.only(bottom: 8),
+            child: LinearProgressIndicator(
+              minHeight: 3,
+              semanticsLabel: 'Loading selected product option',
+            ),
+          ),
         if (showPrice)
           Padding(
             padding: const EdgeInsets.only(bottom: 4),
@@ -176,7 +186,7 @@ class _AddToCartControlState extends ConsumerState<AddToCartControl> {
           children: [
             IconButton(
               tooltip: 'Decrease quantity',
-              onPressed: !_busy && _quantity > 1
+              onPressed: !_busy && !checkingOption && _quantity > 1
                   ? () => setState(() => _quantity--)
                   : null,
               icon: const Icon(Icons.remove),
@@ -189,6 +199,7 @@ class _AddToCartControlState extends ConsumerState<AddToCartControl> {
               tooltip: 'Increase quantity',
               onPressed:
                   !_busy &&
+                      !checkingOption &&
                       permitted &&
                       candidate.permits(alreadyInCart + _quantity + 1)
                   ? () => setState(() => _quantity++)
@@ -200,17 +211,24 @@ class _AddToCartControlState extends ConsumerState<AddToCartControl> {
               child: FilledButton.icon(
                 onPressed:
                     !_busy &&
+                        !checkingOption &&
                         permitted &&
                         (isVariable ? variation != null : reason == null)
                     ? () => _add(variation: variation, options: options)
                     : null,
-                icon: _busy
+                icon: _busy || checkingOption
                     ? const SizedBox.square(
                         dimension: 18,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.add_shopping_cart),
-                label: Text(_busy ? 'Adding...' : 'Add to cart'),
+                label: Text(
+                  _busy
+                      ? 'Adding...'
+                      : checkingOption
+                      ? 'Loading...'
+                      : 'Add to cart',
+                ),
               ),
             ),
           ],
